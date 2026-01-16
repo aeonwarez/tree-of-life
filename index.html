@@ -1033,6 +1033,16 @@
                     <span class="toggle-slider"></span>
                     <span class="toggle-label">Numbers</span>
                 </label>
+                <label class="toggle-item">
+                    <input type="checkbox" id="toggleGrades">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">A∴A∴ Grades</span>
+                </label>
+                <label class="toggle-item">
+                    <input type="checkbox" id="toggleGradeNumbers">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Grade Numbers</span>
+                </label>
             </div>
         </div>
 
@@ -1081,6 +1091,7 @@
             {
                 id: 1, name: "Kether", hebrew: "כתר", meaning: "Crown",
                 color: "#ffffff", pillar: "middle", status: "reference",
+                grade: "10°=1□", gradeName: "Ipsissimus",
                 virtues: [
                     { name: "Yechidah", desc: "The singular essence of Spirit, divine spark" },
                     { name: "Pure Consciousness", desc: "The One Source from which all proceeds" },
@@ -1092,6 +1103,7 @@
             {
                 id: 2, name: "Chokmah", hebrew: "חכמה", meaning: "Wisdom",
                 color: "#b8b8c8", pillar: "right", status: "reference",
+                grade: "9°=2□", gradeName: "Magus",
                 virtues: [
                     { name: "Chiah", desc: "The life-force, spiritual Will, first extension of Kether" },
                     { name: "The Word", desc: "Primal impulse of all life, the Lance" },
@@ -1103,6 +1115,7 @@
             {
                 id: 3, name: "Binah", hebrew: "בינה", meaning: "Understanding",
                 color: "#1a1a2e", pillar: "left", status: "reference",
+                grade: "8°=3□", gradeName: "Magister Templi",
                 virtues: [
                     { name: "Neshamah", desc: "Spiritual intuition, the enlightening faculty" },
                     { name: "The Grail", desc: "Container for chiah, womb of form" },
@@ -1114,6 +1127,7 @@
             {
                 id: 4, name: "Chesed", hebrew: "חסד", meaning: "Mercy",
                 color: "#4169E1", pillar: "right", status: "reference",
+                grade: "7°=4□", gradeName: "Adeptus Exemptus",
                 virtues: [
                     { name: "Memory", desc: "Ruach function: consciousness of soul's path" },
                     { name: "Spiritual Leadership", desc: "Balanced rulership, loving responsibility" },
@@ -1125,6 +1139,7 @@
             {
                 id: 5, name: "Geburah", hebrew: "גבורה", meaning: "Strength",
                 color: "#c41e3a", pillar: "left", status: "reference",
+                grade: "6°=5□", gradeName: "Adeptus Major",
                 virtues: [
                     { name: "Will", desc: "Ruach function: True Will as universal will" },
                     { name: "Energetic Action", desc: "Decisive force applied to proper ends" },
@@ -1136,6 +1151,7 @@
             {
                 id: 6, name: "Tiphareth", hebrew: "תפארת", meaning: "Beauty",
                 color: "#ffd700", pillar: "middle", status: "reference",
+                grade: "5°=6□", gradeName: "Adeptus Minor",
                 virtues: [
                     { name: "Imagination", desc: "Ruach function: communications hub of the soul" },
                     { name: "K&C of HGA", desc: "Knowledge & Conversation of the Holy Guardian Angel" },
@@ -1147,6 +1163,7 @@
             {
                 id: 7, name: "Netzach", hebrew: "נצח", meaning: "Victory",
                 color: "#228b22", pillar: "right", status: "reference",
+                grade: "4°=7□", gradeName: "Philosophus",
                 virtues: [
                     { name: "Desire/Emotion", desc: "Ruach function: fuel for aspiration" },
                     { name: "Bhakti Fire", desc: "Fiery devotion to the Divine" },
@@ -1158,6 +1175,7 @@
             {
                 id: 8, name: "Hod", hebrew: "הוד", meaning: "Splendor",
                 color: "#ff6b35", pillar: "left", status: "reference",
+                grade: "3°=8□", gradeName: "Practicus",
                 virtues: [
                     { name: "Intellect", desc: "Ruach function: cups of form for magical force" },
                     { name: "Mercury's Precision", desc: "Action as equilibrium, Lord of Intelligence" },
@@ -1169,6 +1187,7 @@
             {
                 id: 9, name: "Yesod", hebrew: "יסוד", meaning: "Foundation",
                 color: "#9370db", pillar: "middle", status: "reference",
+                grade: "2°=9□", gradeName: "Zelator",
                 virtues: [
                     { name: "Nephesh", desc: "Instinctual drives, personal unconscious" },
                     { name: "Generative Power", desc: "Vitality, virility, fertility, life-force" },
@@ -1180,6 +1199,7 @@
             {
                 id: 10, name: "Malkuth", hebrew: "מלכות", meaning: "Kingdom",
                 color: "#654321", pillar: "middle", status: "reference",
+                grade: "1°=10□", gradeName: "Neophyte",
                 virtues: [
                     { name: "Guph", desc: "Physical body, senses, temple of flesh" },
                     { name: "Four Elements", desc: "Earth as synthesis of Fire, Water, Air, Earth" },
@@ -1191,6 +1211,7 @@
             {
                 id: 11, name: "Da'ath", hebrew: "דעת", meaning: "Knowledge<br>(Hidden Sephirah)",
                 color: "#1a1a2a", pillar: "middle", status: "reference",
+                grade: "", gradeName: "The Abyss",
                 virtues: [
                     { name: "The Abyss", desc: "Gateway to the supernals" },
                     { name: "Choronzon's Domain", desc: "Where identification dissolves" }
@@ -1635,6 +1656,17 @@
                 .attr('font-weight', '500')
                 .text(seph.id <= 10 ? seph.id : '');
 
+            // Grade number (e.g., 7=4) - above grade name, hidden by default
+            group.append('text')
+                .attr('class', 'sephirah-grade-number')
+                .attr('y', isMobile ? -5 : -6)
+                .attr('text-anchor', 'middle')
+                .style('opacity', 0)
+                .attr('fill', labelColor)
+                .attr('font-weight', '500')
+                .attr('font-size', isMobile ? '7px' : '9px')
+                .text(seph.grade || '');
+
             // Name label - centered in circle
             group.append('text')
                 .attr('class', 'sephirah-label')
@@ -1644,6 +1676,17 @@
                 .attr('font-size', isMobile ? '7px' : '10px')
                 .attr('fill', labelColor)
                 .text(seph.name);
+
+            // Grade name (e.g., Adeptus Minor) - centered, hidden by default
+            group.append('text')
+                .attr('class', 'sephirah-grade')
+                .attr('y', 0)
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .style('opacity', 0)
+                .attr('font-size', isMobile ? '6px' : '8px')
+                .attr('fill', labelColor)
+                .text(seph.gradeName || '');
 
             // Events
             group.on('click', (event) => {
@@ -1889,20 +1932,78 @@
 
         // Toggle for Names
         document.getElementById('toggleNames').addEventListener('change', function() {
+            const showNames = this.checked;
+            // If turning on names, turn off grades
+            if (showNames && document.getElementById('toggleGrades').checked) {
+                document.getElementById('toggleGrades').checked = false;
+                sephirothGroup.selectAll('.sephirah-grade')
+                    .transition().duration(300)
+                    .style('opacity', 0);
+            }
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)
-                .style('opacity', this.checked ? 1 : 0);
+                .style('opacity', showNames ? 1 : 0);
         });
 
         // Toggle for Numbers - also shifts names down when numbers visible
         document.getElementById('toggleNumbers').addEventListener('change', function() {
             const showNumbers = this.checked;
+            // If turning on numbers, turn off grade numbers
+            if (showNumbers && document.getElementById('toggleGradeNumbers').checked) {
+                document.getElementById('toggleGradeNumbers').checked = false;
+                sephirothGroup.selectAll('.sephirah-grade-number')
+                    .transition().duration(300)
+                    .style('opacity', 0);
+            }
             sephirothGroup.selectAll('.sephirah-number')
                 .transition().duration(300)
                 .style('opacity', showNumbers ? 1 : 0);
+            // Shift labels down if numbers or grade numbers visible
+            const showGradeNumbers = document.getElementById('toggleGradeNumbers').checked;
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)
-                .attr('y', showNumbers ? (isMobile ? 6 : 7) : 0);
+                .attr('y', (showNumbers || showGradeNumbers) ? (isMobile ? 6 : 7) : 0);
+            sephirothGroup.selectAll('.sephirah-grade')
+                .transition().duration(300)
+                .attr('y', (showNumbers || showGradeNumbers) ? (isMobile ? 6 : 7) : 0);
+        });
+
+        // Toggle for A∴A∴ Grades (replaces names)
+        document.getElementById('toggleGrades').addEventListener('change', function() {
+            const showGrades = this.checked;
+            // If turning on grades, turn off names
+            if (showGrades && document.getElementById('toggleNames').checked) {
+                document.getElementById('toggleNames').checked = false;
+                sephirothGroup.selectAll('.sephirah-label')
+                    .transition().duration(300)
+                    .style('opacity', 0);
+            }
+            sephirothGroup.selectAll('.sephirah-grade')
+                .transition().duration(300)
+                .style('opacity', showGrades ? 1 : 0);
+        });
+
+        // Toggle for Grade Numbers (replaces numbers)
+        document.getElementById('toggleGradeNumbers').addEventListener('change', function() {
+            const showGradeNumbers = this.checked;
+            // If turning on grade numbers, turn off regular numbers
+            if (showGradeNumbers && document.getElementById('toggleNumbers').checked) {
+                document.getElementById('toggleNumbers').checked = false;
+                sephirothGroup.selectAll('.sephirah-number')
+                    .transition().duration(300)
+                    .style('opacity', 0);
+            }
+            sephirothGroup.selectAll('.sephirah-grade-number')
+                .transition().duration(300)
+                .style('opacity', showGradeNumbers ? 1 : 0);
+            // Shift labels down if numbers or grade numbers visible
+            const showNumbers = document.getElementById('toggleNumbers').checked;
+            sephirothGroup.selectAll('.sephirah-label')
+                .transition().duration(300)
+                .attr('y', (showNumbers || showGradeNumbers) ? (isMobile ? 6 : 7) : 0);
+            sephirothGroup.selectAll('.sephirah-grade')
+                .transition().duration(300)
+                .attr('y', (showNumbers || showGradeNumbers) ? (isMobile ? 6 : 7) : 0);
         });
 
         // Filter by status (legacy - filter buttons removed for reference version)

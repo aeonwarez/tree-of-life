@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tree of Life | Qabalistic Reference Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-deep: #050508;
+            --bg-void: #0a0a0f;
+            --bg-panel: rgba(12, 12, 18, 0.97);
+            --gold: #c9a227;
+            --gold-light: #e8d48b;
+            --gold-dark: #8a6914;
+            --gold-glow: rgba(201, 162, 39, 0.4);
+            
+            /* Sephiroth Colors - Traditional */
+            --kether: #ffffff;
+            --kether-glow: rgba(255, 255, 255, 0.6);
+            --chokmah: #b8b8c8;
+            --chokmah-glow: rgba(184, 184, 200, 0.5);
+            --binah: #1a1a2e;
+            --binah-glow: rgba(26, 26, 46, 0.8);
+            --chesed: #4169E1;
+            --chesed-glow: rgba(65, 105, 225, 0.5);
+            --geburah: #c41e3a;
+            --geburah-glow: rgba(196, 30, 58, 0.5);
+            --tiphareth: #ffd700;
+            --tiphareth-glow: rgba(255, 215, 0, 0.6);
+            --netzach: #228b22;
+            --netzach-glow: rgba(34, 139, 34, 0.5);
+            --hod: #ff6b35;
+            --hod-glow: rgba(255, 107, 53, 0.5);
+            --yesod: #9370db;
+            --yesod-glow: rgba(147, 112, 219, 0.5);
+            --malkuth: #654321;
+            --malkuth-glow: rgba(101, 67, 33, 0.5);
+            --daath: #1a1a2a;
+            --daath-glow: rgba(26, 26, 42, 0.4);
+            
+            /* Status Colors */
+            --completed: #22c55e;
+            --completed-glow: rgba(34, 197, 94, 0.5);
+            --active: #3b82f6;
+            --active-glow: rgba(59, 130, 246, 0.5);
+            --partial: #f59e0b;
+            --partial-glow: rgba(245, 158, 11, 0.5);
+            --remaining: #4b5563;
+            --remaining-glow: rgba(75, 85, 99, 0.3);
+            --reference: #9090a8;
+            --reference-glow: rgba(144, 144, 168, 0.4);
+            
+            --text-primary: #e8e8f0;
+            --text-secondary: #9090a8;
+            --text-dim: #505068;
+            --text-gold: #d4b84a;
+        }
+
+        html, body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            touch-action: none;
+        }
+
+        /* Cosmic Background */
+        .cosmos {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(65, 105, 225, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(147, 112, 219, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(201, 162, 39, 0.02) 0%, transparent 60%);
+        }
+
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--base-opacity); transform: scale(1); }
+            50% { opacity: var(--peak-opacity); transform: scale(1.2); }
+        }
+
+        /* Title */
+        .title-container {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+            width: 100%;
+            padding: 0 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .title-container {
+                background: linear-gradient(to bottom, rgba(5, 5, 8, 0.95) 0%, rgba(5, 5, 8, 0.8) 70%, transparent 100%);
+                padding: 12px 15px 25px 15px;
+                top: 0;
+            }
+        }
+
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1rem, 4.5vw, 1.8rem);
+            font-weight: 600;
+            color: var(--gold);
+            text-shadow: 
+                0 0 30px var(--gold-glow),
+                0 0 60px var(--gold-glow);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(0.65rem, 2.5vw, 0.85rem);
+            color: var(--text-secondary);
+            margin-top: 4px;
+            letter-spacing: 0.25em;
+            font-style: italic;
+        }
+
+        .progress-badge {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 14px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid var(--completed);
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--completed);
+            letter-spacing: 0.1em;
+        }
+
+        /* SVG Container */
+        #tree-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        /* Path styling */
+        .path-line {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .path-line:hover {
+            stroke-width: 4;
+        }
+
+        .path-line.completed { 
+            stroke: var(--completed); 
+            stroke-opacity: 0.85;
+            filter: drop-shadow(0 0 4px var(--completed-glow));
+        }
+        .path-line.active { 
+            stroke: var(--active); 
+            stroke-opacity: 0.85;
+            filter: drop-shadow(0 0 4px var(--active-glow));
+        }
+        .path-line.partial { 
+            stroke: var(--partial); 
+            stroke-opacity: 0.7; 
+            stroke-dasharray: 8,4;
+            filter: drop-shadow(0 0 3px var(--partial-glow));
+        }
+        .path-line.remaining { 
+            stroke: var(--remaining); 
+            stroke-opacity: 0.35; 
+            stroke-dasharray: 4,4;
+        }
+        .path-line.reference { 
+            stroke: var(--reference); 
+            stroke-opacity: 0.7;
+            filter: drop-shadow(0 0 4px var(--reference-glow));
+        }
+
+        /* Sephirah styling */
+        .sephirah {
+            cursor: pointer;
+        }
+
+        .sephirah-circle {
+            transition: filter 0.3s ease;
+            transform-origin: center;
+        }
+
+        .sephirah:hover .sephirah-circle {
+            filter: brightness(1.2);
+        }
+
+        .sephirah-label {
+            font-family: 'Cinzel', serif;
+            fill: var(--text-primary);
+            text-anchor: middle;
+            dominant-baseline: middle;
+            pointer-events: none;
+            font-weight: 500;
+        }
+
+        .sephirah-number {
+            font-family: 'JetBrains Mono', monospace;
+            fill: var(--text-dim);
+            text-anchor: middle;
+            font-size: 9px;
+            pointer-events: none;
+        }
+
+        /* Pillar labels */
+        .pillar-label {
+            font-family: 'Cormorant Garamond', serif;
+            fill: var(--text-dim);
+            text-anchor: middle;
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            opacity: 0.6;
+            font-style: italic;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: var(--bg-panel);
+            border: 1px solid var(--gold-dark);
+            border-radius: 12px;
+            padding: 16px 18px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: calc(100vw - 30px);
+            width: 360px;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.7),
+                0 0 30px rgba(201, 162, 39, 0.1);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            left: 50% !important;
+            transform: translateX(-50%);
+            bottom: 100px;
+        }
+
+        .tooltip.visible {
+            pointer-events: auto;
+        }
+
+        .tooltip-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            .tooltip {
+                bottom: 90px;
+                max-height: 55vh;
+                padding-top: 36px;
+            }
+            
+            .tooltip-close {
+                display: block;
+            }
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip-header {
+            font-family: 'Cinzel', serif;
+            font-size: 1.05rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tooltip-hebrew {
+            font-size: 1.4rem;
+            opacity: 0.9;
+        }
+
+        .tooltip-meaning {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-style: italic;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+        }
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 0.72rem;
+        }
+
+        .tooltip-label {
+            color: var(--text-secondary);
+        }
+
+        .tooltip-value {
+            color: var(--text-primary);
+        }
+
+        .tooltip-status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .status-completed { background: var(--completed); color: #000; }
+        .status-active { background: var(--active); color: #fff; }
+        .status-partial { background: var(--partial); color: #000; }
+        .status-remaining { background: var(--remaining); color: #fff; }
+        .status-reference { background: var(--reference); color: #000; }
+
+        .tooltip-parts {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(201, 162, 39, 0.2);
+        }
+
+        .tooltip-parts-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.65rem;
+            color: var(--gold);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .tooltip-part {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            padding: 2px 0;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: var(--bg-panel);
+            z-index: 700;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top));
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        }
+
+        .detail-panel.visible {
+            transform: translateX(0);
+        }
+
+        .detail-panel-close {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--text-dim);
+            border-radius: 50%;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 710;
+            transition: all 0.2s;
+        }
+
+        .detail-panel-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--gold);
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+            padding-right: 50px;
+        }
+
+        .detail-sephirah-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .detail-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .detail-hebrew {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .detail-meaning {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gold-dark);
+            line-height: 1.6;
+        }
+
+        .detail-section {
+            margin-bottom: 24px;
+        }
+
+        .detail-section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.72rem;
+            color: var(--gold);
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .detail-virtue {
+            background: rgba(255,255,255,0.02);
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 2px solid var(--gold-dark);
+        }
+
+        .detail-virtue-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .detail-virtue-desc {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .detail-parts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .detail-part-item {
+            background: rgba(255,255,255,0.02);
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .detail-part-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .detail-part-name {
+            font-size: 0.82rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        /* Menu Toggle */
+        .menu-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 54px;
+            height: 54px;
+            background: var(--bg-panel);
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            z-index: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.5),
+                0 0 20px var(--gold-glow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-size: 1.3rem;
+            color: var(--gold);
+        }
+
+        .menu-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            max-height: 65vh;
+            background: var(--bg-panel);
+            border-top: 2px solid var(--gold-dark);
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            padding-bottom: calc(24px + env(safe-area-inset-bottom));
+            z-index: 500;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        .control-panel.visible {
+            transform: translateY(0);
+        }
+
+        .control-panel-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--text-dim);
+            border-radius: 2px;
+            margin: 0 auto 18px;
+        }
+
+        .control-section {
+            margin-bottom: 22px;
+        }
+
+        .control-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-bottom: 12px;
+            letter-spacing: 0.1em;
+        }
+
+        /* Filter buttons */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 11px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn:active {
+            transform: scale(0.98);
+        }
+
+        .filter-btn.active {
+            border-color: var(--gold);
+            color: var(--text-primary);
+            background: rgba(201, 162, 39, 0.1);
+        }
+
+        .filter-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Toggle switches */
+        .toggle-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-item input {
+            display: none;
+        }
+
+        .toggle-slider {
+            width: 40px;
+            height: 22px;
+            background: rgba(75, 85, 99, 0.5);
+            border-radius: 11px;
+            position: relative;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s;
+        }
+
+        .toggle-item input:checked + .toggle-slider {
+            background: var(--gold-dark);
+        }
+
+        .toggle-item input:checked + .toggle-slider::before {
+            transform: translateX(18px);
+            background: var(--gold);
+        }
+
+        .toggle-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-item input:checked ~ .toggle-label {
+            color: var(--text-primary);
+        }
+
+        /* Progress section */
+        .progress-container {
+            margin-top: 14px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--completed), var(--gold));
+            border-radius: 5px;
+            transition: width 0.6s ease;
+            box-shadow: 0 0 10px var(--completed-glow);
+        }
+
+        /* Sources */
+        .sources-toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sources-toggle:hover {
+            color: var(--gold-light);
+        }
+
+        .toggle-arrow {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .toggle-arrow.rotated {
+            transform: rotate(90deg);
+        }
+
+        .sources-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, margin 0.3s ease;
+            margin-top: 0;
+        }
+
+        .sources-list.expanded {
+            max-height: 200px;
+            margin-top: 10px;
+        }
+
+        .source-item {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .source-item em {
+            color: var(--text-primary);
+        }
+
+        /* Legend */
+        .legend {
+            position: fixed;
+            top: 90px;
+            right: 10px;
+            background: var(--bg-panel);
+            border: 1px solid var(--gold-dark);
+            border-radius: 10px;
+            padding: 12px 14px;
+            z-index: 400;
+        }
+
+        .legend-desktop {
+            display: none;
+        }
+
+        .legend-mobile {
+            display: block;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(201, 162, 39, 0.2);
+        }
+
+        .legend-mobile .legend-title {
+            text-align: center;
+        }
+
+        .legend-items-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            color: var(--gold);
+            letter-spacing: 0.15em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.62rem;
+            color: var(--text-secondary);
+            margin: 5px 0;
+        }
+
+        .legend-line {
+            width: 18px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 88px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 767px) {
+            .footer {
+                bottom: 70px;
+                width: 100%;
+                background: linear-gradient(to top, rgba(5, 5, 8, 0.95) 0%, rgba(5, 5, 8, 0.8) 60%, transparent 100%);
+                padding: 20px 15px 12px 15px;
+            }
+        }
+
+        .footer-quote {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+        }
+
+        .footer-info {
+            color: var(--gold-dark);
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            margin-top: 3px;
+        }
+
+        /* Desktop */
+        @media (min-width: 768px) {
+            .menu-toggle {
+                display: none;
+            }
+
+            .control-panel {
+                left: 20px;
+                bottom: auto;
+                top: 110px;
+                width: 280px;
+                max-height: calc(100vh - 160px);
+                border-radius: 12px;
+                border: 1px solid var(--gold-dark);
+                transform: translateY(0);
+            }
+
+            .control-panel-handle {
+                display: none;
+            }
+
+            .tooltip {
+                left: auto !important;
+                transform: none;
+                bottom: auto;
+            }
+
+            .detail-panel {
+                width: 420px;
+                left: auto;
+                right: 0;
+                transform: translateX(100%);
+                border-radius: 16px 0 0 16px;
+                border: 1px solid var(--gold-dark);
+                border-right: none;
+            }
+
+            .detail-panel.visible {
+                transform: translateX(0);
+            }
+
+            .legend-desktop {
+                display: block;
+                top: auto;
+                bottom: 24px;
+                right: auto;
+                left: 320px;
+            }
+
+            .legend-mobile {
+                display: none;
+            }
+
+            .footer {
+                bottom: 24px;
+            }
+
+            .title-container {
+                top: 16px;
+            }
+        }
+
+        /* Large desktop */
+        @media (min-width: 1200px) {
+            .control-panel {
+                width: 300px;
+            }
+
+            .legend {
+                left: 340px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+        ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+    </style>
+</head>
+<body>
+    <div class="cosmos"></div>
+    <div class="starfield" id="starfield"></div>
+
+    <div class="title-container">
+        <h1 class="main-title">Tree of Life</h1>
+        <p class="subtitle">Qabalistic Map of the Soul · A∴A∴ Reference</p>
+
+    </div>
+
+    <div id="tree-container">
+        <svg id="tree"></svg>
+    </div>
+
+    <div class="tooltip" id="tooltip">
+        <button class="tooltip-close" onclick="document.getElementById('tooltip').classList.remove('visible')">×</button>
+    </div>
+
+    <div class="detail-panel" id="detailPanel">
+        <button class="detail-panel-close" id="closeDetail">×</button>
+        <div id="detailContent"></div>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle">☰</button>
+
+    <div class="control-panel" id="controlPanel">
+        <div class="control-panel-handle"></div>
+        
+        <div class="control-section">
+            <div class="control-title">✦ View Focus</div>
+            <div class="filter-grid">
+                <button class="filter-btn active" data-view="sephiroth">Sephiroth</button>
+                <button class="filter-btn" data-view="paths">Paths</button>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <div class="control-title">✦ Visual Overlays</div>
+            <div class="toggle-grid">
+                <label class="toggle-item">
+                    <input type="checkbox" id="toggleAin" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Ain Rings</span>
+                </label>
+                <label class="toggle-item">
+                    <input type="checkbox" id="togglePillars" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Temple Pillars</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <div class="control-title">✦ Tree Structure</div>
+            <div style="margin-top: 14px;">
+                <div class="stat-row">
+                    <span class="stat-label">Sephiroth</span>
+                    <span class="stat-value">10 + 1 (Daath)</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Paths</span>
+                    <span class="stat-value">22</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Four Worlds</span>
+                    <span class="stat-value">Atziluth · Briah · Yetzirah · Assiah</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title sources-toggle" onclick="document.getElementById('sourcesList').classList.toggle('expanded'); this.querySelector('.toggle-arrow').classList.toggle('rotated')">
+                ✦ Sources <span class="toggle-arrow">▸</span>
+            </div>
+            <div class="sources-list" id="sourcesList">
+                <div class="source-item">Shoemaker, David. <em>Living Thelema</em></div>
+                <div class="source-item">Shoemaker, David. <em>The Way of the Will</em></div>
+                <div class="source-item">Eshelman, James A. <em>The Mystical & Magical System of the A∴A∴</em></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p class="footer-quote">"As above, so below. As within, so without."</p>
+        <p class="footer-info">93 93/93 · "The Method of Science, the Aim of Religion"</p>
+
+    </div>
+
+
+
+    <script>
+        // ===== TREE OF LIFE DATA - QABALISTIC REFERENCE =====
+        // Cross-referenced: Living Thelema, Way of the Will, Eshelman A∴A∴
+        const sephiroth = [
+            {
+                id: 1, name: "Kether", hebrew: "כתר", meaning: "Crown",
+                color: "#ffffff", pillar: "middle", status: "reference",
+                virtues: [
+                    { name: "Yechidah", desc: "The singular essence of Spirit, divine spark" },
+                    { name: "Pure Consciousness", desc: "The One Source from which all proceeds" },
+                    { name: "I AM", desc: "No Thing, yet potential for All Things" }
+                ],
+                parts: ["Yechidah (Divine Spark)", "Eheieh (I AM)", "Primum Mobile", "Pure Being"],
+                description: "Primum Mobile. The singular source of creative power — divinity itself. Yechidah resides here: the essence of Spirit, the divine spark, and primary linkage to collective consciousness. The point from which all creation emanates."
+            },
+            {
+                id: 2, name: "Chokmah", hebrew: "חכמה", meaning: "Wisdom",
+                color: "#b8b8c8", pillar: "right", status: "reference",
+                virtues: [
+                    { name: "Chiah", desc: "The life-force, spiritual Will, first extension of Kether" },
+                    { name: "The Word", desc: "Primal impulse of all life, the Lance" },
+                    { name: "Dynamic Force", desc: "Universal will, all-powerful and infallible" }
+                ],
+                parts: ["Chiah (Life Force)", "Sphere of the Zodiac", "Yah", "The Word/Logos", "Ab (The Father)"],
+                description: "Sphere of the Zodiac. Chiah — the life-force and spiritual Will — extends from Kether here. The active, masculine, dynamic force that gives the initial spark to all creation. Wisdom as the first emanation of the Divine."
+            },
+            {
+                id: 3, name: "Binah", hebrew: "בינה", meaning: "Understanding",
+                color: "#1a1a2e", pillar: "left", status: "reference",
+                virtues: [
+                    { name: "Neshamah", desc: "Spiritual intuition, the enlightening faculty" },
+                    { name: "The Grail", desc: "Container for chiah, womb of form" },
+                    { name: "The Great Mother", desc: "Receptive wisdom that gives shape to force" }
+                ],
+                parts: ["Neshamah (Intuition)", "Sphere of Saturn", "YHVH Elohim", "The Great Sea", "Ama (Dark Mother)"],
+                description: "Sphere of Saturn. Neshamah — spiritual intuition — gives form to Chokmah's force. The Grail of holy blood into which individual lives have fallen. The Great Mother who receives and shapes the primal force into manifestation."
+            },
+            {
+                id: 4, name: "Chesed", hebrew: "חסד", meaning: "Mercy",
+                color: "#4169E1", pillar: "right", status: "reference",
+                virtues: [
+                    { name: "Memory", desc: "Ruach function: consciousness of soul's path" },
+                    { name: "Spiritual Leadership", desc: "Balanced rulership, loving responsibility" },
+                    { name: "Jupiter Abundance", desc: "Ease of circumstances, joyous plenty" }
+                ],
+                parts: ["Memory (Ruach)", "Sphere of Jupiter", "El", "Mercy", "The Loving Father"],
+                description: "Sphere of Jupiter. Memory resides here in the Ruach. The highest conception of 'god' possible for human consciousness — completion of the archetype before the Abyss. Living from spiritual awareness and balanced leadership. Mercy cascade blooming eternal."
+            },
+            {
+                id: 5, name: "Geburah", hebrew: "גבורה", meaning: "Strength",
+                color: "#c41e3a", pillar: "left", status: "reference",
+                virtues: [
+                    { name: "Will", desc: "Ruach function: True Will as universal will" },
+                    { name: "Energetic Action", desc: "Decisive force applied to proper ends" },
+                    { name: "Mars Power", desc: "Living without fear, enacting justice" }
+                ],
+                parts: ["Will (Ruach)", "Sphere of Mars", "Elohim Gibor", "Strength", "The Warrior"],
+                description: "Sphere of Mars. Will resides here in the Ruach — True Will as extension of universal will. Energetic action, decisive application of proper force, living in accordance with Will. Mars energy fully integrated."
+            },
+            {
+                id: 6, name: "Tiphareth", hebrew: "תפארת", meaning: "Beauty",
+                color: "#ffd700", pillar: "middle", status: "reference",
+                virtues: [
+                    { name: "Imagination", desc: "Ruach function: communications hub of the soul" },
+                    { name: "K&C of HGA", desc: "Knowledge & Conversation of the Holy Guardian Angel" },
+                    { name: "Briatic Consciousness", desc: "Awakened spiritual center, pax profunda" }
+                ],
+                parts: ["Imagination (Ruach)", "Sphere of the Sun", "YHVH Eloah va-Daath", "Beauty", "The Sacrificed God"],
+                description: "Sphere of the Sun. The central Sephirah of the Tree and seat of the Holy Guardian Angel. Imagination functions as the communications hub of the Ruach. Here the aspirant achieves the Knowledge and Conversation of the Holy Guardian Angel — the pivotal attainment of the Great Work."
+            },
+            {
+                id: 7, name: "Netzach", hebrew: "נצח", meaning: "Victory",
+                color: "#228b22", pillar: "right", status: "reference",
+                virtues: [
+                    { name: "Desire/Emotion", desc: "Ruach function: fuel for aspiration" },
+                    { name: "Bhakti Fire", desc: "Fiery devotion to the Divine" },
+                    { name: "Venus Love", desc: "Attractions and repulsions mastered" }
+                ],
+                parts: ["Desire (Ruach)", "Sphere of Venus", "YHVH Tzabaoth", "Victory", "Bhakti/Devotion"],
+                description: "Sphere of Venus. Element of Fire. Emotion and desire reside here — fuel for aspiration and medium for love. Bhakti Yoga's fiery devotion. The soul yearns for the divine. Creative and sexual energy fully liberated."
+            },
+            {
+                id: 8, name: "Hod", hebrew: "הוד", meaning: "Splendor",
+                color: "#ff6b35", pillar: "left", status: "reference",
+                virtues: [
+                    { name: "Intellect", desc: "Ruach function: cups of form for magical force" },
+                    { name: "Mercury's Precision", desc: "Action as equilibrium, Lord of Intelligence" },
+                    { name: "Gnostic Structure", desc: "Thought-forms as vessels for the liquid of Will" }
+                ],
+                parts: ["Intellect (Ruach)", "Sphere of Mercury", "Elohim Tzabaoth", "Splendor", "Ceremonial Magick"],
+                description: "Sphere of Mercury. Element of Water. Intellect resides here — building conscious thoughts as cups of form. The mind as vessel and mirror of the macrocosm. Mental discipline organizing life in service to Will. The mind refined and disciplined."
+            },
+            {
+                id: 9, name: "Yesod", hebrew: "יסוד", meaning: "Foundation",
+                color: "#9370db", pillar: "middle", status: "reference",
+                virtues: [
+                    { name: "Nephesh", desc: "Instinctual drives, personal unconscious" },
+                    { name: "Generative Power", desc: "Vitality, virility, fertility, life-force" },
+                    { name: "Lunar Tides", desc: "Stability identical with change" }
+                ],
+                parts: ["Nephesh (Animal Soul)", "Sphere of the Moon", "Shaddai El Chai", "Foundation", "Astral Light"],
+                description: "Sphere of the Moon. Element of Air. Nephesh — the personal unconscious and instinctual drives — resides here. Generative, creative, vitalizing forces. Seeing past the veil of matter to perceive astral patterns. Nephesh fully liberated."
+            },
+            {
+                id: 10, name: "Malkuth", hebrew: "מלכות", meaning: "Kingdom",
+                color: "#654321", pillar: "middle", status: "reference",
+                virtues: [
+                    { name: "Guph", desc: "Physical body, senses, temple of flesh" },
+                    { name: "Four Elements", desc: "Earth as synthesis of Fire, Water, Air, Earth" },
+                    { name: "Divine Immanence", desc: "Finding Spirit in all physical manifestation" }
+                ],
+                parts: ["Guph (Physical Body)", "Sphere of the Elements", "Adonai ha-Aretz", "Kingdom", "Malkah (The Bride)"],
+                description: "Sphere of the Elements. Guph — the physical body and senses — through which the universe witnesses itself. The prima materia, the 'rough ashlar' awaiting transformation. Earth and body fully integrated."
+            },
+            {
+                id: 11, name: "Da'ath", hebrew: "דעת", meaning: "Knowledge<br>(Hidden Sephirah)",
+                color: "#1a1a2a", pillar: "middle", status: "reference",
+                virtues: [
+                    { name: "The Abyss", desc: "Gateway to the supernals" },
+                    { name: "Choronzon's Domain", desc: "Where identification dissolves" }
+                ],
+                parts: ["The Abyss", "Knowledge", "Gateway to Supernals", "Choronzon's Domain"],
+                description: "The hidden Sephirah — not a Sephirah proper but the Abyss that separates the Supernal Triad from the rest of the Tree. Here the aspirant must pour all attainments into Babalon's Cup, surrendering every attachment to cross into the realm of the Masters."
+            }
+        ];
+
+        // PATHS - UPDATED JAN 15, 2026
+        // Cross-referenced: Living Thelema, Way of the Will, Eshelman A∴A∴
+        // Using Thoth attributions (Tzaddi=Emperor, Heh=Star)
+        const paths = [
+            // 22 PATHS - Traditional Qabalistic attributions
+            { id: 32, name: "The Universe", tarot: "XXI", letter: "Tav", from: 10, to: 9, status: "reference", 
+              desc: "The Great One of the Night of Time. Awakened to astral forces interpenetrating matter. Muladhara activated, kundalini stirring. The Cross of Four Elements traversed." },
+            { id: 31, name: "The Aeon", tarot: "XX", letter: "Shin", from: 10, to: 8, status: "reference", 
+              desc: "Aeonic force flooding consciousness, dissolving outworn forms. Fire element transforming inner structures. Revolutionary rebirth into the New Aeon." },
+            { id: 30, name: "The Sun", tarot: "XIX", letter: "Resh", from: 9, to: 8, status: "reference", 
+              desc: "Inner sun shining into subconscious, liberating from old-aeon conditioning. Anahata chakra opened — agape, freedom, shameless joy. True inner freedom attained." },
+            { id: 29, name: "The Moon", tarot: "XVIII", letter: "Qoph", from: 10, to: 7, status: "reference", 
+              desc: "Ruler of Flux & Reflux. Night passage through the unconscious, mastering primal fears. The 'back of the head' — ancient brain functions integrated. Darkness navigated." },
+            { id: 28, name: "The Emperor", tarot: "IV", letter: "Tzaddi", from: 9, to: 7, status: "reference", 
+              desc: "Sun of the Morning, Chief Among the Mighty. The fish-hook raising instinctual Yesod energies toward Netzach's spiritual fire. Inner initiator awakened." },
+            { id: 27, name: "The Tower", tarot: "XVI", letter: "Peh", from: 8, to: 7, status: "reference", 
+              desc: "Lord of the Hosts of the Mighty. Netzach's fire blasting apart calcified Hod structures. Svadisthana activated. Old thought-forms destroyed for renewal." },
+            { id: 26, name: "The Devil", tarot: "XV", letter: "Ayin", from: 6, to: 8, status: "reference", 
+              desc: "Lord of the Gates of Matter. Seeing past appearance of evil to perceive the HGA in all manifest reality. Shadow integrated, illusion pierced." },
+            { id: 25, name: "Art", tarot: "XIV", letter: "Samekh", from: 6, to: 9, status: "reference", 
+              desc: "Daughter of the Reconcilers. Path of the Arrow — direct ascent up Middle Pillar. Union of Sun and Moon within. VITRIOL: the hidden stone of True Will found." },
+            { id: 24, name: "Death", tarot: "XIII", letter: "Nun", from: 6, to: 7, status: "reference", 
+              desc: "Child of the Great Transformers. Ego released catastrophic death concept. Nun means 'to sprout' — every destruction a mystery of regeneration. Identity transformed." },
+            { id: 23, name: "The Hanged Man", tarot: "XII", letter: "Mem", from: 5, to: 8, status: "reference", 
+              desc: "Spirit of the Mighty Waters. Geburah's strength flowing into Hod's form. Surrender as power. Perspective inverted, deeper insight gained." },
+            { id: 22, name: "Adjustment", tarot: "XI", letter: "Lamed", from: 5, to: 6, status: "reference", 
+              desc: "Daughter of the Lords of Truth. Geburah's justice balanced with Tiphareth's beauty. Actions aligned with True Will. Karma adjusted, equilibrium restored." },
+            { id: 21, name: "Fortune", tarot: "X", letter: "Kaph", from: 4, to: 7, status: "reference", 
+              desc: "Lord of the Forces of Life. Jupiter's mercy descending to Venus's desire. The Wheel turns — cycles embraced, change welcomed as ally." },
+            { id: 20, name: "The Hermit", tarot: "IX", letter: "Yod", from: 4, to: 6, status: "reference", 
+              desc: "Magus of the Voice of Power. The seed-flame of Chesed illuminating Tiphareth. Inner light as guide. Solitary truth-seeking completed." },
+            { id: 19, name: "Lust", tarot: "VIII", letter: "Teth", from: 4, to: 5, status: "reference", 
+              desc: "Daughter of the Flaming Sword. Love (Chesed) and Strength (Geburah) united. The Beast and Babalon in sacred congress. Primal power tamed through joy." },
+            { id: 18, name: "The Chariot", tarot: "VII", letter: "Cheth", from: 3, to: 5, status: "reference", 
+              desc: "Child of the Powers of the Waters. Binah's understanding directing Geburah's force. The Graal carried forth. Inner conflicts mastered, victory assured." },
+            { id: 17, name: "The Lovers", tarot: "VI", letter: "Zayin", from: 3, to: 6, status: "reference", 
+              desc: "Children of the Voice Divine. Binah's understanding kissing Tiphareth's beauty. The Sacred Marriage within. Opposites integrated, authentic connection born." },
+            { id: 16, name: "The Hierophant", tarot: "V", letter: "Vav", from: 2, to: 4, status: "reference", 
+              desc: "Magus of the Eternal. Chokmah's wisdom structuring Chesed's mercy. Becoming one's own spiritual teacher." },
+            { id: 15, name: "The Star", tarot: "XVII", letter: "Heh", from: 2, to: 6, status: "reference", 
+              desc: "Daughter of the Firmament. Chokmah's dynamic will manifesting through Tiphareth's harmony. Hope as spiritual force." },
+            { id: 14, name: "The Empress", tarot: "III", letter: "Daleth", from: 2, to: 3, status: "reference", 
+              desc: "Daughter of the Mighty Ones. The door between the supernal Father and Mother. Creative fertility bridging force and form." },
+            { id: 13, name: "The High Priestess", tarot: "II", letter: "Gimel", from: 1, to: 6, status: "reference", 
+              desc: "Priestess of the Silver Star. The longest path — Crown to Heart across the Abyss. Uniting above and below." },
+            { id: 12, name: "The Magician", tarot: "I", letter: "Beth", from: 1, to: 3, status: "reference", 
+              desc: "Magus of Power. Kether's unity channeling into Binah's form. Divine will becoming structured creation." },
+            { id: 11, name: "The Fool", tarot: "0", letter: "Aleph", from: 1, to: 2, status: "reference", 
+              desc: "Spirit of Æther. The breath between Kether and Chokmah. Zero containing infinity. The first step, the final path." }
+        ];
+
+        // Tree layout positions (normalized 0-1, will be scaled)
+        const positions = {
+            1: { x: 0.5, y: 0.05 },   // Kether
+            2: { x: 0.78, y: 0.17 },  // Chokmah
+            3: { x: 0.22, y: 0.17 },  // Binah
+            11: { x: 0.5, y: 0.27 },  // Da'ath
+            4: { x: 0.78, y: 0.38 },  // Chesed
+            5: { x: 0.22, y: 0.38 },  // Geburah
+            6: { x: 0.5, y: 0.50 },   // Tiphareth (centered between 0.38 and 0.62)
+            7: { x: 0.78, y: 0.62 },  // Netzach
+            8: { x: 0.22, y: 0.62 },  // Hod
+            9: { x: 0.5, y: 0.75 },   // Yesod
+            10: { x: 0.5, y: 0.92 }   // Malkuth
+        };
+
+        // ===== VISUALIZATION =====
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        const isMobile = width < 768;
+
+        // Starfield
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            starfield.innerHTML = '';
+            const starCount = isMobile ? 100 : 180;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                const size = Math.random() * 2.2 + 0.4;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.setProperty('--duration', `${Math.random() * 4 + 2}s`);
+                star.style.setProperty('--delay', `${Math.random() * 3}s`);
+                star.style.setProperty('--base-opacity', Math.random() * 0.25 + 0.1);
+                star.style.setProperty('--peak-opacity', Math.random() * 0.6 + 0.3);
+                starfield.appendChild(star);
+            }
+        }
+        createStarfield();
+
+        // Set up SVG
+        const svg = d3.select('#tree').attr('viewBox', [0, 0, width, height]);
+        const g = svg.append('g');
+
+        // Calculate actual positions
+        const margin = isMobile ? 35 : 80;
+        const treeWidth = Math.min(width - margin * 2, 520);
+        const treeHeight = isMobile ? height - margin * 2 - 200 : height - margin * 2 - 70;
+        const offsetX = (width - treeWidth) / 2;
+        const offsetY = isMobile ? margin + 110 : margin + 95;
+
+        function getPos(id) {
+            const pos = positions[id];
+            return {
+                x: offsetX + pos.x * treeWidth,
+                y: offsetY + pos.y * treeHeight
+            };
+        }
+
+        // Draw pillar labels (desktop only)
+        if (!isMobile) {
+            const pillarLabelsGroup = g.append('g').attr('id', 'pillarLabels');
+            pillarLabelsGroup.append('text').attr('class', 'pillar-label')
+                .attr('x', getPos(3).x).attr('y', getPos(1).y + 45)
+                .text('PILLAR OF SEVERITY');
+            pillarLabelsGroup.append('text').attr('class', 'pillar-label')
+                .attr('x', getPos(1).x).attr('y', getPos(3).y - 15)
+                .text('PILLAR OF EQUILIBRIUM');
+            pillarLabelsGroup.append('text').attr('class', 'pillar-label')
+                .attr('x', getPos(2).x).attr('y', getPos(1).y + 45)
+                .text('PILLAR OF MERCY');
+        }
+
+        // ===== AIN SOPH RINGS (closer together) =====
+        const ketherPos = getPos(1);
+        const ainGroup = g.append('g').attr('class', 'ain-rings').attr('id', 'ainRings');
+        
+        // Ring sizes - closer together now
+        const ringScale = isMobile ? 0.6 : 0.85;
+        const baseRadius = isMobile ? 45 : 55;
+        const ainRadii = [
+            { r: baseRadius + 50 * ringScale, label: 'AIN - NOTHING', opacity: 0.12 },
+            { r: baseRadius + 30 * ringScale, label: 'AIN SOPH - LIMITLESS', opacity: 0.18 },
+            { r: baseRadius + 10 * ringScale, label: 'AIN SOPH AUR - LIMITLESS LIGHT', opacity: 0.25 }
+        ];
+
+        // Draw concentric rings
+        ainRadii.forEach((ring, i) => {
+            ainGroup.append('circle')
+                .attr('cx', ketherPos.x)
+                .attr('cy', ketherPos.y)
+                .attr('r', ring.r)
+                .attr('fill', 'none')
+                .attr('stroke', 'rgba(255, 255, 255, ' + ring.opacity + ')')
+                .attr('stroke-width', 1)
+                .attr('stroke-dasharray', i === 0 ? '2,4' : i === 1 ? '4,4' : 'none');
+            
+            // Curved text along TOP arc of ring (sweep flag 1 for top arc, text reads left to right)
+            const pathId = `ainPath${i}`;
+            // Create path that goes along the TOP of the circle (from left to right, curving upward)
+            ainGroup.append('path')
+                .attr('id', pathId)
+                .attr('d', `M ${ketherPos.x - ring.r} ${ketherPos.y} A ${ring.r} ${ring.r} 0 0 1 ${ketherPos.x + ring.r} ${ketherPos.y}`)
+                .attr('fill', 'none')
+                .attr('stroke', 'none');
+            
+            ainGroup.append('text')
+                .attr('dy', -5) // Offset text above the path line
+                .append('textPath')
+                .attr('href', '#' + pathId)
+                .attr('startOffset', '50%')
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'rgba(255, 255, 255, ' + (ring.opacity + 0.15) + ')')
+                .attr('font-family', "'Cormorant Garamond', serif")
+                .attr('font-size', isMobile ? '7px' : '10px')
+                .attr('letter-spacing', '0.12em')
+                .text(ring.label);
+        });
+
+        // ===== TEMPLE PILLARS (BOAZ & JACHIN) - Behind left/right sephiroth =====
+        const pillarsGroup = g.append('g').attr('class', 'temple-pillars').attr('id', 'templePillars');
+        const pillarWidth = isMobile ? 50 : 75;
+        
+        // Get sephiroth positions for pillar placement
+        const binahPos = getPos(3);
+        const chokmahPos = getPos(2);
+        const hodPos = getPos(8);
+        const netzachPos = getPos(7);
+        
+        // Left pillar behind Binah-Geburah-Hod column
+        const leftPillarX = binahPos.x - pillarWidth / 2;
+        const leftPillarTop = binahPos.y - 40;
+        const leftPillarHeight = hodPos.y - binahPos.y + 80;
+        
+        // Right pillar behind Chokmah-Chesed-Netzach column  
+        const rightPillarX = chokmahPos.x - pillarWidth / 2;
+        const rightPillarTop = chokmahPos.y - 40;
+        const rightPillarHeight = netzachPos.y - chokmahPos.y + 80;
+        
+        // Left Pillar (Boaz - Black - Severity)
+        pillarsGroup.append('rect')
+            .attr('x', leftPillarX)
+            .attr('y', leftPillarTop)
+            .attr('width', pillarWidth)
+            .attr('height', leftPillarHeight)
+            .attr('fill', 'rgba(15, 15, 20, 0.5)')
+            .attr('stroke', 'rgba(60, 60, 70, 0.3)')
+            .attr('stroke-width', 1)
+            .attr('rx', 4);
+        
+        // Left pillar capital
+        pillarsGroup.append('rect')
+            .attr('x', leftPillarX - 8)
+            .attr('y', leftPillarTop - 23)
+            .attr('width', pillarWidth + 16)
+            .attr('height', 22)
+            .attr('fill', 'rgba(25, 25, 30, 0.6)')
+            .attr('stroke', 'rgba(60, 60, 70, 0.3)')
+            .attr('rx', 3);
+        
+        // MINUS symbol inside left pillar capital
+        const minusSize = isMobile ? 8 : 10;
+        pillarsGroup.append('line')
+            .attr('x1', binahPos.x - minusSize / 2)
+            .attr('y1', leftPillarTop - 12)
+            .attr('x2', binahPos.x + minusSize / 2)
+            .attr('y2', leftPillarTop - 12)
+            .attr('stroke', 'rgba(120, 120, 130, 0.8)')
+            .attr('stroke-width', isMobile ? 1.5 : 2)
+            .attr('stroke-linecap', 'round');
+        
+        // Left pillar base
+        pillarsGroup.append('rect')
+            .attr('x', leftPillarX - 10)
+            .attr('y', leftPillarTop + leftPillarHeight + 2)
+            .attr('width', pillarWidth + 20)
+            .attr('height', 28)
+            .attr('fill', 'rgba(25, 25, 30, 0.6)')
+            .attr('stroke', 'rgba(60, 60, 70, 0.3)')
+            .attr('rx', 3);
+        
+        // Boaz label
+        pillarsGroup.append('text')
+            .attr('x', leftPillarX + pillarWidth / 2)
+            .attr('y', leftPillarTop + leftPillarHeight + 55)
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'rgba(120, 120, 130, 0.5)')
+            .attr('font-family', "'Cinzel', serif")
+            .attr('font-size', isMobile ? '8px' : '11px')
+            .attr('letter-spacing', '0.15em')
+            .text('BOAZ');
+        
+        pillarsGroup.append('text')
+            .attr('x', leftPillarX + pillarWidth / 2)
+            .attr('y', leftPillarTop + leftPillarHeight + 70)
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'rgba(100, 100, 110, 0.4)')
+            .attr('font-family', "'Cormorant Garamond', serif")
+            .attr('font-size', isMobile ? '7px' : '9px')
+            .attr('font-style', 'italic')
+            .text('Pillar of Severity');
+        
+        // Hebrew ב on pillar
+        pillarsGroup.append('text')
+            .attr('x', leftPillarX + pillarWidth / 2)
+            .attr('y', leftPillarTop + leftPillarHeight / 2)
+            .attr('text-anchor', 'middle')
+            .attr('dominant-baseline', 'middle')
+            .attr('fill', 'rgba(80, 80, 90, 0.25)')
+            .attr('font-size', isMobile ? '24px' : '36px')
+            .text('ב');
+
+        // Right Pillar (Jachin - White - Mercy)
+        pillarsGroup.append('rect')
+            .attr('x', rightPillarX)
+            .attr('y', rightPillarTop)
+            .attr('width', pillarWidth)
+            .attr('height', rightPillarHeight)
+            .attr('fill', 'rgba(200, 200, 210, 0.08)')
+            .attr('stroke', 'rgba(150, 150, 160, 0.25)')
+            .attr('stroke-width', 1)
+            .attr('rx', 4);
+        
+        // Right pillar capital
+        pillarsGroup.append('rect')
+            .attr('x', rightPillarX - 8)
+            .attr('y', rightPillarTop - 23)
+            .attr('width', pillarWidth + 16)
+            .attr('height', 22)
+            .attr('fill', 'rgba(180, 180, 190, 0.12)')
+            .attr('stroke', 'rgba(150, 150, 160, 0.25)')
+            .attr('rx', 3);
+        
+        // PLUS symbol inside right pillar capital
+        const plusSize = isMobile ? 8 : 10;
+        // Horizontal line of plus
+        pillarsGroup.append('line')
+            .attr('x1', chokmahPos.x - plusSize / 2)
+            .attr('y1', rightPillarTop - 12)
+            .attr('x2', chokmahPos.x + plusSize / 2)
+            .attr('y2', rightPillarTop - 12)
+            .attr('stroke', 'rgba(200, 200, 210, 0.8)')
+            .attr('stroke-width', isMobile ? 1.5 : 2)
+            .attr('stroke-linecap', 'round');
+        
+        // Vertical line of plus
+        pillarsGroup.append('line')
+            .attr('x1', chokmahPos.x)
+            .attr('y1', rightPillarTop - 12 - plusSize / 2)
+            .attr('x2', chokmahPos.x)
+            .attr('y2', rightPillarTop - 12 + plusSize / 2)
+            .attr('stroke', 'rgba(200, 200, 210, 0.8)')
+            .attr('stroke-width', isMobile ? 1.5 : 2)
+            .attr('stroke-linecap', 'round');
+        
+        // Right pillar base
+        pillarsGroup.append('rect')
+            .attr('x', rightPillarX - 10)
+            .attr('y', rightPillarTop + rightPillarHeight + 2)
+            .attr('width', pillarWidth + 20)
+            .attr('height', 28)
+            .attr('fill', 'rgba(180, 180, 190, 0.12)')
+            .attr('stroke', 'rgba(150, 150, 160, 0.25)')
+            .attr('rx', 3);
+        
+        // Jachin label
+        pillarsGroup.append('text')
+            .attr('x', rightPillarX + pillarWidth / 2)
+            .attr('y', rightPillarTop + rightPillarHeight + 55)
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'rgba(150, 150, 160, 0.5)')
+            .attr('font-family', "'Cinzel', serif")
+            .attr('font-size', isMobile ? '8px' : '11px')
+            .attr('letter-spacing', '0.15em')
+            .text('JACHIN');
+        
+        pillarsGroup.append('text')
+            .attr('x', rightPillarX + pillarWidth / 2)
+            .attr('y', rightPillarTop + rightPillarHeight + 70)
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'rgba(130, 130, 140, 0.4)')
+            .attr('font-family', "'Cormorant Garamond', serif")
+            .attr('font-size', isMobile ? '7px' : '9px')
+            .attr('font-style', 'italic')
+            .text('Pillar of Mercy');
+        
+        // Hebrew י on pillar
+        pillarsGroup.append('text')
+            .attr('x', rightPillarX + pillarWidth / 2)
+            .attr('y', rightPillarTop + rightPillarHeight / 2)
+            .attr('text-anchor', 'middle')
+            .attr('dominant-baseline', 'middle')
+            .attr('fill', 'rgba(150, 150, 160, 0.25)')
+            .attr('font-size', isMobile ? '24px' : '36px')
+            .text('י');
+
+        // Draw paths
+        const pathGroup = g.append('g').attr('class', 'paths');
+
+        paths.forEach(path => {
+            const from = getPos(path.from);
+            const to = getPos(path.to);
+            
+            pathGroup.append('line')
+                .attr('class', `path-line ${path.status}`)
+                .attr('x1', from.x)
+                .attr('y1', from.y)
+                .attr('x2', to.x)
+                .attr('y2', to.y)
+                .attr('data-path-id', path.id)
+                .on('click', (event) => {
+                    event.stopPropagation();
+                    showPathTooltip(event, path);
+                })
+                .on('mouseover', function(event) {
+                    if (!isMobile) showPathTooltip(event, path);
+                })
+                .on('mouseout', () => {
+                    if (!isMobile) tooltip.classed('visible', false);
+                });
+        });
+
+        // Draw sephiroth
+        const sephirothGroup = g.append('g').attr('class', 'sephiroth');
+        const tooltip = d3.select('#tooltip');
+
+        sephiroth.forEach(seph => {
+            const pos = getPos(seph.id);
+            const radius = seph.id === 6 ? (isMobile ? 26 : 36) : 
+                          (isMobile ? 20 : 28);
+            
+            // Da'ath gets reduced opacity
+            const isDaath = seph.id === 11;
+            const opacity = isDaath ? 0.4 : 1;
+
+            const group = sephirothGroup.append('g')
+                .attr('class', 'sephirah')
+                .attr('transform', `translate(${pos.x}, ${pos.y})`)
+                .attr('data-seph-id', seph.id)
+                .style('opacity', opacity);
+
+            // Glow filter based on status
+            let glowFilter = '';
+            if (seph.status === 'completed') {
+                glowFilter = `drop-shadow(0 0 12px ${seph.color}) drop-shadow(0 0 6px var(--completed-glow))`;
+            } else if (seph.status === 'partial') {
+                glowFilter = `drop-shadow(0 0 8px ${seph.color}) drop-shadow(0 0 4px var(--partial-glow))`;
+            } else {
+                glowFilter = isDaath ? 'none' : `drop-shadow(0 0 4px ${seph.color}40)`;
+            }
+
+            // Circle
+            group.append('circle')
+                .attr('class', 'sephirah-circle')
+                .attr('r', radius)
+                .attr('fill', seph.color)
+                .attr('stroke', seph.status === 'completed' ? 'var(--completed)' : 
+                               seph.status === 'partial' ? 'var(--partial)' : 'var(--remaining)')
+                .attr('stroke-width', seph.id === 6 ? 3.5 : 2)
+                .attr('stroke-dasharray', seph.status === 'partial' ? '6,3' : 
+                                         seph.status === 'remaining' ? '3,3' : null)
+                .style('filter', glowFilter);
+
+            // Label - middle pillar (Kether, Da'ath, Tiphareth, Yesod, Malkuth) shifted down 1px
+            const isMiddlePillar = seph.pillar === 'middle';
+            const labelColor = (seph.id === 3 || seph.id === 11) ? '#e8e8f0' : 
+                              (seph.color === '#ffffff' || seph.color === '#ffd700') ? '#000000' : '#e8e8f0';
+            group.append('text')
+                .attr('class', 'sephirah-label')
+                .attr('y', isMiddlePillar ? 1 : 0)
+                .attr('font-size', isMobile ? '8px' : '10px')
+                .attr('fill', labelColor)
+                .text(seph.name);
+
+            // Number (below circle) - white
+            group.append('text')
+                .attr('class', 'sephirah-number')
+                .attr('y', radius + 14)
+                .attr('fill', '#ffffff')
+                .attr('font-weight', '500')
+                .text(seph.id <= 10 ? seph.id : '');
+
+            // Events
+            group.on('click', (event) => {
+                event.stopPropagation();
+                showDetailPanel(seph);
+            });
+
+            if (!isMobile) {
+                group.on('mouseover', (event) => showSephTooltip(event, seph))
+                    .on('mouseout', () => tooltip.classed('visible', false));
+            }
+        });
+
+        // Tooltip functions
+        function showSephTooltip(event, seph) {
+            
+            tooltip.html(`
+                <button class="tooltip-close" onclick="document.getElementById('tooltip').classList.remove('visible')">×</button>
+                <div class="tooltip-header" style="color: ${seph.color === '#1a1a2e' || seph.color === '#1a1a2a' ? 'var(--gold)' : seph.color};">
+                    <span class="tooltip-hebrew">${seph.hebrew}</span>
+                    <span>${seph.name}</span>
+                </div>
+                <div class="tooltip-meaning" style="color: var(--text); font-size: 0.95rem;">${seph.meaning}</div>
+                <div class="tooltip-row">
+                    <span class="tooltip-label">Pillar</span>
+                    <span class="tooltip-value">${seph.pillar.charAt(0).toUpperCase() + seph.pillar.slice(1)}</span>
+                </div>
+                ${seph.parts.length > 0 ? `
+                <div class="tooltip-parts">
+                    <div class="tooltip-parts-title">Correspondences</div>
+                    ${seph.parts.slice(0, 3).map(p => `<div class="tooltip-part">• ${p}</div>`).join('')}
+                    ${seph.parts.length > 3 ? `<div class="tooltip-part" style="color: var(--text-dim);">+ ${seph.parts.length - 3} more...</div>` : ''}
+                </div>
+                ` : ''}
+            `);
+            
+            if (!isMobile) {
+                tooltip.style('left', (event.pageX + 15) + 'px').style('top', (event.pageY - 15) + 'px');
+            }
+            tooltip.classed('visible', true);
+        }
+
+        function showPathTooltip(event, path) {
+            const fromSeph = sephiroth.find(s => s.id === path.from);
+            const toSeph = sephiroth.find(s => s.id === path.to);
+            
+            // Keep close button at top
+            tooltip.html(`
+                <button class="tooltip-close" onclick="document.getElementById('tooltip').classList.remove('visible')">×</button>
+                <div class="tooltip-header" style="color: var(--gold);">
+                    <span>Path ${path.id} · ${path.letter}</span>
+                </div>
+                <div class="tooltip-meaning" style="color: var(--text); font-size: 0.95rem;">Atu ${path.tarot} · ${path.name}</div>
+                <div class="tooltip-row">
+                    <span class="tooltip-label">Connects</span>
+                    <span class="tooltip-value">${fromSeph?.name} → ${toSeph?.name}</span>
+                </div>
+                <div style="margin-top: 12px; font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; color: var(--text-secondary); font-style: italic; line-height: 1.5;">${path.desc}</div>
+            `);
+            
+            if (!isMobile) {
+                tooltip.style('left', (event.pageX + 15) + 'px').style('top', (event.pageY - 15) + 'px');
+            }
+            tooltip.classed('visible', true);
+            
+            // On mobile, auto-dismiss after 4 seconds
+            if (isMobile) {
+                setTimeout(() => tooltip.classed('visible', false), 4000);
+            }
+        }
+
+        // Detail Panel
+        function showDetailPanel(seph) {
+            const panel = document.getElementById('detailPanel');
+            const content = document.getElementById('detailContent');
+            const displayColor = (seph.color === '#1a1a2e' || seph.color === '#1a1a2a') ? '#3a3a5a' : seph.color;
+
+            const connectedPaths = paths.filter(p => p.from === seph.id || p.to === seph.id);
+
+            content.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-sephirah-icon" style="background: ${displayColor};">
+                        ${seph.id <= 10 ? seph.id : '∅'}
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <div class="detail-title">${seph.name}</div>
+                        <div style="color: var(--text); font-size: 1.1rem;">${seph.meaning}</div>
+                    </div>
+                    <div style="color: var(--text-dim); font-size: 1.5rem; align-self: center;">${seph.hebrew}</div>
+                </div>
+                <div class="detail-meaning">${seph.description}</div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Information</div>
+                    <div class="stat-row">
+                        <span class="stat-label">Pillar</span>
+                        <span class="stat-value">${seph.pillar.charAt(0).toUpperCase() + seph.pillar.slice(1)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Correspondences</span>
+                        <span class="stat-value">${seph.parts.length}</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-section-title">Virtues</div>
+                    ${seph.virtues.map(v => `
+                        <div class="detail-virtue">
+                            <div class="detail-virtue-name">${v.name}</div>
+                            <div class="detail-virtue-desc">${v.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                ${seph.parts.length > 0 ? `
+                <div class="detail-section">
+                    <div class="detail-section-title">Correspondences (${seph.parts.length})</div>
+                    <div class="detail-parts-list">
+                        ${seph.parts.map(p => `
+                            <div class="detail-part-item">
+                                <div class="detail-part-dot" style="background: ${displayColor};"></div>
+                                <span class="detail-part-name">${p}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="detail-section">
+                    <div class="detail-section-title">Connected Paths (${connectedPaths.length})</div>
+                    <div class="detail-parts-list">
+                        ${connectedPaths.map(p => {
+                            const otherSeph = sephiroth.find(s => s.id === (p.from === seph.id ? p.to : p.from));
+                            const pathStatusColor = 'var(--reference)';
+                            return `
+                                <div class="detail-part-item" style="cursor: pointer;" onclick="showPathDetail(${p.id})">
+                                    <div class="detail-part-dot" style="background: ${pathStatusColor};"></div>
+                                    <span class="detail-part-name">${p.tarot} ${p.name} → ${otherSeph?.name}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+
+            panel.classList.add('visible');
+        }
+        
+        // Path detail panel (for clicking connected paths)
+        function showPathDetail(pathId) {
+            const path = paths.find(p => p.id === pathId);
+            if (!path) return;
+            
+            const panel = document.getElementById('detailPanel');
+            const content = document.getElementById('detailContent');
+            const fromSeph = sephiroth.find(s => s.id === path.from);
+            const toSeph = sephiroth.find(s => s.id === path.to);
+            const iconColor = 'var(--gold)';
+            
+            content.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-sephirah-icon" style="background: ${iconColor};">
+                        ${path.tarot}
+                    </div>
+                    <div>
+                        <div class="detail-title">${path.name}</div>
+                        <div class="detail-hebrew">Path ${path.id} · ${path.letter}</div>
+                    </div>
+                </div>
+                <div class="detail-meaning">${path.desc}</div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Path Information</div>
+                    <div class="stat-row">
+                        <span class="stat-label">Tarot Trump</span>
+                        <span class="stat-value">${path.tarot} - ${path.name}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Hebrew Letter</span>
+                        <span class="stat-value">${path.letter}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Connects</span>
+                        <span class="stat-value">${fromSeph?.name} ↔ ${toSeph?.name}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-section-title">Connected Sephiroth</div>
+                    <div class="detail-parts-list">
+                        <div class="detail-part-item" style="cursor: pointer;" onclick="showDetailPanel(sephiroth.find(s => s.id === ${path.from}))">
+                            <div class="detail-part-dot" style="background: ${fromSeph?.color === '#1a1a2e' || fromSeph?.color === '#1a1a2a' ? '#3a3a5a' : fromSeph?.color};"></div>
+                            <span class="detail-part-name">${fromSeph?.name} (${fromSeph?.meaning})</span>
+                        </div>
+                        <div class="detail-part-item" style="cursor: pointer;" onclick="showDetailPanel(sephiroth.find(s => s.id === ${path.to}))">
+                            <div class="detail-part-dot" style="background: ${toSeph?.color === '#1a1a2e' || toSeph?.color === '#1a1a2a' ? '#3a3a5a' : toSeph?.color};"></div>
+                            <span class="detail-part-name">${toSeph?.name} (${toSeph?.meaning})</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            panel.classList.add('visible');
+        }
+        
+        // Make showPathDetail globally available
+        window.showPathDetail = showPathDetail;
+
+        document.getElementById('closeDetail').addEventListener('click', () => {
+            document.getElementById('detailPanel').classList.remove('visible');
+        });
+
+        // Menu toggle (mobile)
+        const menuToggle = document.getElementById('menuToggle');
+        const controlPanel = document.getElementById('controlPanel');
+
+        menuToggle.addEventListener('click', () => {
+            controlPanel.classList.toggle('visible');
+        });
+
+        // Toggle for Ain rings
+        document.getElementById('toggleAin').addEventListener('change', function() {
+            const ainRings = document.getElementById('ainRings');
+            if (ainRings) {
+                ainRings.style.opacity = this.checked ? 1 : 0;
+                ainRings.style.transition = 'opacity 0.4s ease';
+            }
+        });
+
+        // Toggle for Temple pillars
+        document.getElementById('togglePillars').addEventListener('change', function() {
+            const templePillars = document.getElementById('templePillars');
+            const pillarLabels = document.getElementById('pillarLabels');
+            if (templePillars) {
+                templePillars.style.opacity = this.checked ? 1 : 0;
+                templePillars.style.transition = 'opacity 0.4s ease';
+            }
+            if (pillarLabels) {
+                pillarLabels.style.opacity = this.checked ? 1 : 0;
+                pillarLabels.style.transition = 'opacity 0.4s ease';
+            }
+        });
+
+        // Filter by status (legacy - filter buttons removed for reference version)
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                
+                // Filter sephiroth
+                sephirothGroup.selectAll('.sephirah').style('opacity', function() {
+                    const id = +this.getAttribute('data-seph-id');
+                    const seph = sephiroth.find(s => s.id === id);
+                    if (filter === 'all') return 1;
+                    return seph.status === filter ? 1 : 0.12;
+                });
+
+                // Filter paths
+                pathGroup.selectAll('.path-line').style('opacity', function() {
+                    const pathId = +this.getAttribute('data-path-id');
+                    const path = paths.find(p => p.id === pathId);
+                    if (filter === 'all') return 0.7;
+                    return path.status === filter ? 0.7 : 0.08;
+                });
+
+                if (isMobile) controlPanel.classList.remove('visible');
+            });
+        });
+
+        // View toggle (sephiroth vs paths)
+        document.querySelectorAll('.filter-btn[data-view]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn[data-view]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const view = this.dataset.view;
+                
+                if (view === 'sephiroth') {
+                    sephirothGroup.transition().duration(300).style('opacity', 1);
+                    pathGroup.transition().duration(300).style('opacity', 0.4);
+                } else {
+                    sephirothGroup.transition().duration(300).style('opacity', 0.4);
+                    pathGroup.transition().duration(300).style('opacity', 1);
+                }
+
+                if (isMobile) controlPanel.classList.remove('visible');
+            });
+        });
+
+        // Zoom & pan
+        const zoom = d3.zoom()
+            .scaleExtent([0.5, 2.5])
+            .on('zoom', event => g.attr('transform', event.transform));
+        
+        svg.call(zoom);
+        
+        // Set initial transform for mobile to ensure tree doesn't cover header
+        if (isMobile) {
+            const initialScale = 0.9;
+            const initialX = width * (1 - initialScale) / 2;
+            const initialY = 20;
+            svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(initialScale));
+        }
+
+        // Double-tap to reset zoom (mobile)
+        let lastTap = 0;
+        svg.on('touchend', (event) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) {
+                svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+            }
+            lastTap = currentTime;
+        });
+
+        // Close tooltip on background click
+        svg.on('click', () => {
+            tooltip.classed('visible', false);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            svg.attr('viewBox', [0, 0, width, height]);
+        });
+    </script>
+</body>
+</html>

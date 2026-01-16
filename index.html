@@ -1584,11 +1584,11 @@
 
         sephiroth.forEach(seph => {
             const pos = getPos(seph.id);
-            const radius = seph.id === 6 ? (isMobile ? 28 : 36) :
-                          (isMobile ? 22 : 28);
-            
+            const radius = isMobile ? 22 : (seph.id === 6 ? 36 : 28);
+
             // Da'ath gets reduced opacity
             const isDaath = seph.id === 11;
+            const isKether = seph.id === 1;
             const opacity = isDaath ? 0.4 : 1;
 
             const group = sephirothGroup.append('g')
@@ -1597,9 +1597,11 @@
                 .attr('data-seph-id', seph.id)
                 .style('opacity', opacity);
 
-            // Glow filter based on status
+            // Glow filter based on status - Kether always glows bright
             let glowFilter = '';
-            if (seph.status === 'completed') {
+            if (isKether) {
+                glowFilter = `drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 45px rgba(255, 255, 255, 0.3))`;
+            } else if (seph.status === 'completed') {
                 glowFilter = `drop-shadow(0 0 12px ${seph.color}) drop-shadow(0 0 6px var(--completed-glow))`;
             } else if (seph.status === 'partial') {
                 glowFilter = `drop-shadow(0 0 8px ${seph.color}) drop-shadow(0 0 4px var(--partial-glow))`;
@@ -1612,9 +1614,9 @@
                 .attr('class', 'sephirah-circle')
                 .attr('r', radius)
                 .attr('fill', seph.color)
-                .attr('stroke', seph.status === 'completed' ? 'var(--completed)' : 
+                .attr('stroke', seph.status === 'completed' ? 'var(--completed)' :
                                seph.status === 'partial' ? 'var(--partial)' : 'var(--remaining)')
-                .attr('stroke-width', seph.id === 6 ? 3.5 : 2)
+                .attr('stroke-width', (seph.id === 6 && !isMobile) ? 3.5 : 2)
                 .attr('stroke-dasharray', seph.status === 'partial' ? '6,3' : 
                                          seph.status === 'remaining' ? '3,3' : null)
                 .style('filter', glowFilter);

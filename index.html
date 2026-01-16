@@ -1211,13 +1211,22 @@
             {
                 id: 11, name: "Da'ath", hebrew: "דעת", meaning: "Knowledge<br>(Hidden Sephirah)",
                 color: "#1a1a2a", pillar: "middle", status: "reference",
-                grade: "", gradeName: ["The", "Abyss"],
+                grade: "", gradeName: ["Babe of", "the Abyss"],
                 virtues: [
                     { name: "The Abyss", desc: "Gateway to the supernals" },
                     { name: "Choronzon's Domain", desc: "Where identification dissolves" }
                 ],
                 parts: ["The Abyss", "Knowledge", "Gateway to Supernals", "Choronzon's Domain"],
                 description: "The hidden Sephirah — not a Sephirah proper but the Abyss that separates the Supernal Triad from the rest of the Tree. Here the aspirant must pour all attainments into Babalon's Cup, surrendering every attachment to cross into the realm of the Masters."
+            },
+            {
+                id: 0, name: "", hebrew: "", meaning: "",
+                color: "transparent", pillar: "middle", status: "reference",
+                grade: "0°=0°", gradeName: "Probationer",
+                virtues: [],
+                parts: [],
+                description: "The Student who has been admitted to probation. The beginning of the Path, dedicated to obtaining a scientific knowledge of the nature and powers of one's own being.",
+                isProbationer: true
             }
         ];
 
@@ -1274,17 +1283,18 @@
 
         // Tree layout positions (normalized 0-1, will be scaled)
         const positions = {
-            1: { x: 0.5, y: 0.05 },   // Kether
-            2: { x: 0.78, y: 0.17 },  // Chokmah
-            3: { x: 0.22, y: 0.17 },  // Binah
-            11: { x: 0.5, y: 0.27 },  // Da'ath
-            4: { x: 0.78, y: 0.38 },  // Chesed
-            5: { x: 0.22, y: 0.38 },  // Geburah
-            6: { x: 0.5, y: 0.50 },   // Tiphareth (centered between 0.38 and 0.62)
-            7: { x: 0.78, y: 0.62 },  // Netzach
-            8: { x: 0.22, y: 0.62 },  // Hod
-            9: { x: 0.5, y: 0.75 },   // Yesod
-            10: { x: 0.5, y: 0.92 }   // Malkuth
+            1: { x: 0.5, y: 0.03 },   // Kether
+            2: { x: 0.78, y: 0.14 },  // Chokmah
+            3: { x: 0.22, y: 0.14 },  // Binah
+            11: { x: 0.5, y: 0.23 },  // Da'ath
+            4: { x: 0.78, y: 0.33 },  // Chesed
+            5: { x: 0.22, y: 0.33 },  // Geburah
+            6: { x: 0.5, y: 0.44 },   // Tiphareth
+            7: { x: 0.78, y: 0.55 },  // Netzach
+            8: { x: 0.22, y: 0.55 },  // Hod
+            9: { x: 0.5, y: 0.67 },   // Yesod
+            10: { x: 0.5, y: 0.82 },  // Malkuth
+            0: { x: 0.5, y: 0.97 }    // Probationer (below Malkuth)
         };
 
         // ===== VISUALIZATION =====
@@ -1600,6 +1610,45 @@
         sephiroth.forEach(seph => {
             const pos = getPos(seph.id);
             const radius = isMobile ? 22 : (seph.id === 6 ? 36 : 28);
+
+            // Special handling for Probationer (id 0) - just text, no circle
+            if (seph.isProbationer) {
+                const probGroup = sephirothGroup.append('g')
+                    .attr('class', 'probationer')
+                    .attr('transform', `translate(${pos.x}, ${pos.y})`);
+
+                // Horizontal line above
+                probGroup.append('line')
+                    .attr('x1', -40)
+                    .attr('x2', 40)
+                    .attr('y1', isMobile ? -18 : -22)
+                    .attr('y2', isMobile ? -18 : -22)
+                    .attr('stroke', 'var(--text-dim)')
+                    .attr('stroke-width', 1);
+
+                // Grade number (0°=0°)
+                probGroup.append('text')
+                    .attr('class', 'sephirah-grade-number probationer-grade-number')
+                    .attr('y', isMobile ? -2 : -4)
+                    .attr('text-anchor', 'middle')
+                    .style('opacity', 0)
+                    .attr('fill', 'var(--text-secondary)')
+                    .attr('font-size', isMobile ? '9px' : '11px')
+                    .attr('font-weight', '500')
+                    .text(seph.grade);
+
+                // Grade name (Probationer)
+                probGroup.append('text')
+                    .attr('class', 'sephirah-grade probationer-grade')
+                    .attr('y', isMobile ? 12 : 14)
+                    .attr('text-anchor', 'middle')
+                    .style('opacity', 0)
+                    .attr('fill', 'var(--text-secondary)')
+                    .attr('font-size', isMobile ? '8px' : '10px')
+                    .text(seph.gradeName);
+
+                return; // Skip the rest of sephirah rendering
+            }
 
             // Da'ath gets reduced opacity
             const isDaath = seph.id === 11;

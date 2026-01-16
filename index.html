@@ -1628,16 +1628,18 @@
             // Number - above name, hidden by default
             group.append('text')
                 .attr('class', 'sephirah-number')
-                .attr('y', isMobile ? -6 : -8)
+                .attr('y', isMobile ? -5 : -6)
+                .attr('text-anchor', 'middle')
                 .style('opacity', 0)
                 .attr('fill', labelColor)
                 .attr('font-weight', '500')
                 .text(seph.id <= 10 ? seph.id : '');
 
-            // Name label - centered in circle, below number
+            // Name label - centered in circle
             group.append('text')
                 .attr('class', 'sephirah-label')
-                .attr('y', isMobile ? 6 : 7)
+                .attr('y', 0)
+                .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
                 .attr('font-size', isMobile ? '7px' : '10px')
                 .attr('fill', labelColor)
@@ -1892,11 +1894,15 @@
                 .style('opacity', this.checked ? 1 : 0);
         });
 
-        // Toggle for Numbers
+        // Toggle for Numbers - also shifts names down when numbers visible
         document.getElementById('toggleNumbers').addEventListener('change', function() {
+            const showNumbers = this.checked;
             sephirothGroup.selectAll('.sephirah-number')
                 .transition().duration(300)
-                .style('opacity', this.checked ? 1 : 0);
+                .style('opacity', showNumbers ? 1 : 0);
+            sephirothGroup.selectAll('.sephirah-label')
+                .transition().duration(300)
+                .attr('y', showNumbers ? (isMobile ? 6 : 7) : 0);
         });
 
         // Filter by status (legacy - filter buttons removed for reference version)

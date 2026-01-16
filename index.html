@@ -2034,18 +2034,18 @@
             const anyNumbersVisible = showNumbers || document.getElementById('toggleGradeNumbers').checked;
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)
-                .attr('y', anyNumbersVisible ? (isMobile ? 6 : 7) : 0);
+                .attr('y', anyNumbersVisible ? (isMobile ? 4 : 5) : 0);
             // Shift single-line grades
             sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
-                .attr('y', anyNumbersVisible ? (isMobile ? 6 : 7) : 0);
+                .attr('y', anyNumbersVisible ? (isMobile ? 4 : 5) : 0);
             // Shift two-line grades
             sephirothGroup.selectAll('.sephirah-grade-line1')
                 .transition().duration(300)
-                .attr('y', anyNumbersVisible ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
+                .attr('y', anyNumbersVisible ? (isMobile ? 2 : 3) : (isMobile ? -5 : -6));
             sephirothGroup.selectAll('.sephirah-grade-line2')
                 .transition().duration(300)
-                .attr('y', anyNumbersVisible ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
+                .attr('y', anyNumbersVisible ? (isMobile ? 12 : 15) : (isMobile ? 5 : 6));
         });
 
         // Toggle for A∴A∴ Grades (replaces names)
@@ -2063,16 +2063,16 @@
             sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', anyNumbersVisible ? (isMobile ? 6 : 7) : 0);
+                .attr('y', anyNumbersVisible ? (isMobile ? 4 : 5) : 0);
             // Two-line grades
             sephirothGroup.selectAll('.sephirah-grade-line1')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', anyNumbersVisible ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
+                .attr('y', anyNumbersVisible ? (isMobile ? 2 : 3) : (isMobile ? -5 : -6));
             sephirothGroup.selectAll('.sephirah-grade-line2')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', anyNumbersVisible ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
+                .attr('y', anyNumbersVisible ? (isMobile ? 12 : 15) : (isMobile ? 5 : 6));
             // Probationer grade and line
             sephirothGroup.selectAll('.probationer-grade')
                 .transition().duration(300)
@@ -2110,18 +2110,18 @@
             // Shift sephirah labels down if grade numbers visible
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 6 : 7) : 0);
+                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : 0);
             // Single-line grades shift (exclude probationer)
             sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 6 : 7) : 0);
+                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : 0);
             // Two-line grades shift
             sephirothGroup.selectAll('.sephirah-grade-line1')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
+                .attr('y', showGradeNumbers ? (isMobile ? 2 : 3) : (isMobile ? -5 : -6));
             sephirothGroup.selectAll('.sephirah-grade-line2')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
+                .attr('y', showGradeNumbers ? (isMobile ? 12 : 15) : (isMobile ? 5 : 6));
         });
 
         // Filter by status (legacy - filter buttons removed for reference version)

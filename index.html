@@ -1115,7 +1115,7 @@
             {
                 id: 3, name: "Binah", hebrew: "בינה", meaning: "Understanding",
                 color: "#1a1a2e", pillar: "left", status: "reference",
-                grade: "8°=3□", gradeName: "Magister Templi",
+                grade: "8°=3□", gradeName: ["Magister", "Templi"],
                 virtues: [
                     { name: "Neshamah", desc: "Spiritual intuition, the enlightening faculty" },
                     { name: "The Grail", desc: "Container for chiah, womb of form" },
@@ -1127,7 +1127,7 @@
             {
                 id: 4, name: "Chesed", hebrew: "חסד", meaning: "Mercy",
                 color: "#4169E1", pillar: "right", status: "reference",
-                grade: "7°=4□", gradeName: "Adeptus Exemptus",
+                grade: "7°=4□", gradeName: ["Adeptus", "Exemptus"],
                 virtues: [
                     { name: "Memory", desc: "Ruach function: consciousness of soul's path" },
                     { name: "Spiritual Leadership", desc: "Balanced rulership, loving responsibility" },
@@ -1139,7 +1139,7 @@
             {
                 id: 5, name: "Geburah", hebrew: "גבורה", meaning: "Strength",
                 color: "#c41e3a", pillar: "left", status: "reference",
-                grade: "6°=5□", gradeName: "Adeptus Major",
+                grade: "6°=5□", gradeName: ["Adeptus", "Major"],
                 virtues: [
                     { name: "Will", desc: "Ruach function: True Will as universal will" },
                     { name: "Energetic Action", desc: "Decisive force applied to proper ends" },
@@ -1151,7 +1151,7 @@
             {
                 id: 6, name: "Tiphareth", hebrew: "תפארת", meaning: "Beauty",
                 color: "#ffd700", pillar: "middle", status: "reference",
-                grade: "5°=6□", gradeName: "Adeptus Minor",
+                grade: "5°=6□", gradeName: ["Adeptus", "Minor"],
                 virtues: [
                     { name: "Imagination", desc: "Ruach function: communications hub of the soul" },
                     { name: "K&C of HGA", desc: "Knowledge & Conversation of the Holy Guardian Angel" },
@@ -1211,7 +1211,7 @@
             {
                 id: 11, name: "Da'ath", hebrew: "דעת", meaning: "Knowledge<br>(Hidden Sephirah)",
                 color: "#1a1a2a", pillar: "middle", status: "reference",
-                grade: "", gradeName: "The Abyss",
+                grade: "", gradeName: ["The", "Abyss"],
                 virtues: [
                     { name: "The Abyss", desc: "Gateway to the supernals" },
                     { name: "Choronzon's Domain", desc: "Where identification dissolves" }
@@ -1672,15 +1672,38 @@
                 .text(seph.name);
 
             // Grade name (e.g., Adeptus Minor) - centered, hidden by default
-            group.append('text')
-                .attr('class', 'sephirah-grade')
-                .attr('y', 0)
-                .attr('text-anchor', 'middle')
-                .attr('dominant-baseline', 'middle')
-                .style('opacity', 0)
-                .attr('font-size', isMobile ? '6px' : '8px')
-                .attr('fill', labelColor)
-                .text(seph.gradeName || '');
+            // Handle both single-line and two-line grade names
+            const gradeNameIsArray = Array.isArray(seph.gradeName);
+            if (gradeNameIsArray) {
+                // Two-line grade name
+                group.append('text')
+                    .attr('class', 'sephirah-grade sephirah-grade-line1')
+                    .attr('y', isMobile ? -5 : -6)
+                    .attr('text-anchor', 'middle')
+                    .style('opacity', 0)
+                    .attr('font-size', isMobile ? '6px' : '8px')
+                    .attr('fill', labelColor)
+                    .text(seph.gradeName[0] || '');
+                group.append('text')
+                    .attr('class', 'sephirah-grade sephirah-grade-line2')
+                    .attr('y', isMobile ? 5 : 6)
+                    .attr('text-anchor', 'middle')
+                    .style('opacity', 0)
+                    .attr('font-size', isMobile ? '6px' : '8px')
+                    .attr('fill', labelColor)
+                    .text(seph.gradeName[1] || '');
+            } else {
+                // Single-line grade name
+                group.append('text')
+                    .attr('class', 'sephirah-grade')
+                    .attr('y', 0)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'middle')
+                    .style('opacity', 0)
+                    .attr('font-size', isMobile ? '6px' : '8px')
+                    .attr('fill', labelColor)
+                    .text(seph.gradeName || '');
+            }
 
             // Events
             group.on('click', (event) => {

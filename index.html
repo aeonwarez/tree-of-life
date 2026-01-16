@@ -1765,10 +1765,10 @@
             `);
             
             if (!isMobile) {
-                tooltip.style('left', (event.pageX + 15) + 'px').style('top', (event.pageY - 15) + 'px');
+                tooltip.style('left', (event.pageX + 5) + 'px').style('top', (event.pageY + 5) + 'px');
             }
             tooltip.classed('visible', true);
-            
+
             // On mobile, auto-dismiss after 4 seconds
             if (isMobile) {
                 setTimeout(() => tooltip.classed('visible', false), 4000);

@@ -1623,23 +1623,23 @@
             const labelColor = (seph.id === 1 || seph.id === 6) ? '#000000' :
                               (seph.id === 3 || seph.id === 11) ? '#e8e8f0' : '#e8e8f0';
 
-            // Name label - centered in circle
-            group.append('text')
-                .attr('class', 'sephirah-label')
-                .attr('y', 0)
-                .attr('dominant-baseline', 'middle')
-                .attr('font-size', isMobile ? '7px' : '10px')
-                .attr('fill', labelColor)
-                .text(seph.name);
-
-            // Number - inside circle, below name, same color as name, hidden by default
+            // Number - above name, hidden by default
             group.append('text')
                 .attr('class', 'sephirah-number')
-                .attr('y', 18)
+                .attr('y', isMobile ? -6 : -8)
                 .style('opacity', 0)
                 .attr('fill', labelColor)
                 .attr('font-weight', '500')
                 .text(seph.id <= 10 ? seph.id : '');
+
+            // Name label - centered in circle, below number
+            group.append('text')
+                .attr('class', 'sephirah-label')
+                .attr('y', isMobile ? 6 : 7)
+                .attr('dominant-baseline', 'middle')
+                .attr('font-size', isMobile ? '7px' : '10px')
+                .attr('fill', labelColor)
+                .text(seph.name);
 
             // Events
             group.on('click', (event) => {

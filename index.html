@@ -1023,6 +1023,16 @@
                     <span class="toggle-slider"></span>
                     <span class="toggle-label">Temple Pillars</span>
                 </label>
+                <label class="toggle-item">
+                    <input type="checkbox" id="toggleNames" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Names</span>
+                </label>
+                <label class="toggle-item">
+                    <input type="checkbox" id="toggleNumbers" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Numbers</span>
+                </label>
             </div>
         </div>
 
@@ -1606,22 +1616,23 @@
                                          seph.status === 'remaining' ? '3,3' : null)
                 .style('filter', glowFilter);
 
-            // Label - middle pillar (Kether, Da'ath, Tiphareth, Yesod, Malkuth) shifted down 1px
-            const isMiddlePillar = seph.pillar === 'middle';
+            // Label color - black on light sephiroth (Kether, Tiphareth), white on dark
             const labelColor = (seph.id === 1 || seph.id === 6) ? '#000000' :
                               (seph.id === 3 || seph.id === 11) ? '#e8e8f0' : '#e8e8f0';
+
+            // Name label - centered in circle
             group.append('text')
                 .attr('class', 'sephirah-label')
-                .attr('y', isMiddlePillar ? 1 : 0)
+                .attr('y', -4)
                 .attr('font-size', isMobile ? '8px' : '10px')
                 .attr('fill', labelColor)
                 .text(seph.name);
 
-            // Number (below circle) - darker gray, centered
+            // Number - inside circle, below name, same color as name
             group.append('text')
                 .attr('class', 'sephirah-number')
-                .attr('y', radius + 14)
-                .attr('fill', '#666666')
+                .attr('y', 10)
+                .attr('fill', labelColor)
                 .attr('font-weight', '500')
                 .text(seph.id <= 10 ? seph.id : '');
 
@@ -1865,6 +1876,20 @@
                 pillarLabels.style.opacity = this.checked ? 1 : 0;
                 pillarLabels.style.transition = 'opacity 0.4s ease';
             }
+        });
+
+        // Toggle for Names
+        document.getElementById('toggleNames').addEventListener('change', function() {
+            sephirothGroup.selectAll('.sephirah-label')
+                .transition().duration(300)
+                .style('opacity', this.checked ? 1 : 0);
+        });
+
+        // Toggle for Numbers
+        document.getElementById('toggleNumbers').addEventListener('change', function() {
+            sephirothGroup.selectAll('.sephirah-number')
+                .transition().duration(300)
+                .style('opacity', this.checked ? 1 : 0);
         });
 
         // Filter by status (legacy - filter buttons removed for reference version)

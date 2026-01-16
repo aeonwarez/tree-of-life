@@ -1294,7 +1294,7 @@
             8: { x: 0.22, y: 0.55 },  // Hod
             9: { x: 0.5, y: 0.67 },   // Yesod
             10: { x: 0.5, y: 0.82 },  // Malkuth
-            0: { x: 0.5, y: 0.97 }    // Probationer (below Malkuth)
+            0: { x: 0.5, y: 0.94 }    // Probationer (below Malkuth)
         };
 
         // ===== VISUALIZATION =====
@@ -1617,14 +1617,16 @@
                     .attr('class', 'probationer')
                     .attr('transform', `translate(${pos.x}, ${pos.y})`);
 
-                // Horizontal line above
+                // Horizontal line above (hidden by default)
                 probGroup.append('line')
+                    .attr('class', 'probationer-line')
                     .attr('x1', -40)
                     .attr('x2', 40)
-                    .attr('y1', isMobile ? -18 : -22)
-                    .attr('y2', isMobile ? -18 : -22)
+                    .attr('y1', isMobile ? -14 : -18)
+                    .attr('y2', isMobile ? -14 : -18)
                     .attr('stroke', 'var(--text-dim)')
-                    .attr('stroke-width', 1);
+                    .attr('stroke-width', 1)
+                    .style('opacity', 0);
 
                 // Grade number (0°=0°)
                 probGroup.append('text')
@@ -2063,10 +2065,15 @@
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
                 .attr('y', showGradeNumbers ? (isMobile ? 14 : 17) : (isMobile ? 5 : 6));
-            // Probationer grade
+            // Probationer grade and line
             sephirothGroup.selectAll('.probationer-grade')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0);
+            // Show line when grades or grade numbers visible
+            const gradeNumbersOn = document.getElementById('toggleGradeNumbers').checked;
+            sephirothGroup.selectAll('.probationer-line')
+                .transition().duration(300)
+                .style('opacity', (showGrades || gradeNumbersOn) ? 1 : 0);
         });
 
         // Toggle for Grade Numbers (replaces numbers)
@@ -2084,10 +2091,14 @@
             sephirothGroup.selectAll('.sephirah-grade-number:not(.probationer-grade-number)')
                 .transition().duration(300)
                 .style('opacity', showGradeNumbers ? 1 : 0);
-            // Probationer grade number
+            // Probationer grade number and line
             sephirothGroup.selectAll('.probationer-grade-number')
                 .transition().duration(300)
                 .style('opacity', showGradeNumbers ? 1 : 0);
+            // Show line when grades or grade numbers visible
+            sephirothGroup.selectAll('.probationer-line')
+                .transition().duration(300)
+                .style('opacity', (showGrades || showGradeNumbers) ? 1 : 0);
             // Shift sephirah labels down if numbers or grade numbers visible
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)

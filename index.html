@@ -1591,15 +1591,10 @@
                 .attr('x2', to.x)
                 .attr('y2', to.y)
                 .attr('data-path-id', path.id)
+                .style('cursor', 'pointer')
                 .on('click', (event) => {
                     event.stopPropagation();
-                    showPathTooltip(event, path);
-                })
-                .on('mouseover', function(event) {
-                    if (!isMobile) showPathTooltip(event, path);
-                })
-                .on('mouseout', () => {
-                    if (!isMobile) tooltip.classed('visible', false);
+                    showPathDetail(path.id);
                 });
         });
 
@@ -1761,11 +1756,6 @@
                 event.stopPropagation();
                 showDetailPanel(seph);
             });
-
-            if (!isMobile) {
-                group.on('mouseover', (event) => showSephTooltip(event, seph))
-                    .on('mouseout', () => tooltip.classed('visible', false));
-            }
         });
 
         // Tooltip functions

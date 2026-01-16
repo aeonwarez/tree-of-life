@@ -1800,11 +1800,15 @@
                     <div class="detail-section-title">Information</div>
                     <div class="stat-row">
                         <span class="stat-label">Pillar</span>
-                        <span class="stat-value">${seph.pillar.charAt(0).toUpperCase() + seph.pillar.slice(1)}</span>
+                        <span class="stat-value">${seph.pillar === 'left' ? 'Severity' : seph.pillar === 'right' ? 'Mercy' : 'Equilibrium'}</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Correspondences</span>
-                        <span class="stat-value">${seph.parts.length}</span>
+                        <span class="stat-label">A∴A∴ Grade</span>
+                        <span class="stat-value">${Array.isArray(seph.gradeName) ? seph.gradeName.join(' ') : (seph.gradeName || '—')}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">A∴A∴ Number</span>
+                        <span class="stat-value">${seph.grade || '—'}</span>
                     </div>
                 </div>
 

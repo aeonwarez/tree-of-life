@@ -1029,7 +1029,7 @@
                     <span class="toggle-label">Names</span>
                 </label>
                 <label class="toggle-item">
-                    <input type="checkbox" id="toggleNumbers" checked>
+                    <input type="checkbox" id="toggleNumbers">
                     <span class="toggle-slider"></span>
                     <span class="toggle-label">Numbers</span>
                 </label>
@@ -1628,10 +1628,11 @@
                 .attr('fill', labelColor)
                 .text(seph.name);
 
-            // Number - inside circle, below name, same color as name
+            // Number - inside circle, below name, same color as name, hidden by default
             group.append('text')
                 .attr('class', 'sephirah-number')
-                .attr('y', 10)
+                .attr('y', 18)
+                .style('opacity', 0)
                 .attr('fill', labelColor)
                 .attr('font-weight', '500')
                 .text(seph.id <= 10 ? seph.id : '');

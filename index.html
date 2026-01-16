@@ -1340,14 +1340,8 @@
         if (!isMobile) {
             const pillarLabelsGroup = g.append('g').attr('id', 'pillarLabels');
             pillarLabelsGroup.append('text').attr('class', 'pillar-label')
-                .attr('x', getPos(3).x).attr('y', getPos(1).y + 45)
-                .text('PILLAR OF SEVERITY');
-            pillarLabelsGroup.append('text').attr('class', 'pillar-label')
                 .attr('x', getPos(1).x).attr('y', getPos(3).y - 15)
                 .text('PILLAR OF EQUILIBRIUM');
-            pillarLabelsGroup.append('text').attr('class', 'pillar-label')
-                .attr('x', getPos(2).x).attr('y', getPos(1).y + 45)
-                .text('PILLAR OF MERCY');
         }
 
         // ===== AIN SOPH RINGS (closer together) =====

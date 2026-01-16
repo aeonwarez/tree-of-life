@@ -2017,7 +2017,7 @@
                 .style('opacity', showNames ? 1 : 0);
         });
 
-        // Toggle for Numbers - also shifts names down when numbers visible
+        // Toggle for Numbers - also shifts names/grades down when numbers visible
         document.getElementById('toggleNumbers').addEventListener('change', function() {
             const showNumbers = this.checked;
             // If turning on numbers, turn off grade numbers
@@ -2030,20 +2030,28 @@
             sephirothGroup.selectAll('.sephirah-number')
                 .transition().duration(300)
                 .style('opacity', showNumbers ? 1 : 0);
-            // Shift labels down if numbers or grade numbers visible
-            const showGradeNumbers = document.getElementById('toggleGradeNumbers').checked;
+            // Shift labels down if any numbers visible
+            const anyNumbersVisible = showNumbers || document.getElementById('toggleGradeNumbers').checked;
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)
-                .attr('y', (showNumbers || showGradeNumbers) ? (isMobile ? 6 : 7) : 0);
-            sephirothGroup.selectAll('.sephirah-grade')
+                .attr('y', anyNumbersVisible ? (isMobile ? 6 : 7) : 0);
+            // Shift single-line grades
+            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
-                .attr('y', (showNumbers || showGradeNumbers) ? (isMobile ? 6 : 7) : 0);
+                .attr('y', anyNumbersVisible ? (isMobile ? 6 : 7) : 0);
+            // Shift two-line grades
+            sephirothGroup.selectAll('.sephirah-grade-line1')
+                .transition().duration(300)
+                .attr('y', anyNumbersVisible ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
+            sephirothGroup.selectAll('.sephirah-grade-line2')
+                .transition().duration(300)
+                .attr('y', anyNumbersVisible ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
         });
 
         // Toggle for A∴A∴ Grades (replaces names)
         document.getElementById('toggleGrades').addEventListener('change', function() {
             const showGrades = this.checked;
-            const showGradeNumbers = document.getElementById('toggleGradeNumbers').checked;
+            const anyNumbersVisible = document.getElementById('toggleNumbers').checked || document.getElementById('toggleGradeNumbers').checked;
             // If turning on grades, turn off names
             if (showGrades && document.getElementById('toggleNames').checked) {
                 document.getElementById('toggleNames').checked = false;
@@ -2051,20 +2059,20 @@
                     .transition().duration(300)
                     .style('opacity', 0);
             }
-            // Single-line grades
-            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2)')
+            // Single-line grades (exclude probationer)
+            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : 0);
+                .attr('y', anyNumbersVisible ? (isMobile ? 6 : 7) : 0);
             // Two-line grades
             sephirothGroup.selectAll('.sephirah-grade-line1')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : (isMobile ? -5 : -6));
+                .attr('y', anyNumbersVisible ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
             sephirothGroup.selectAll('.sephirah-grade-line2')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', showGradeNumbers ? (isMobile ? 14 : 17) : (isMobile ? 5 : 6));
+                .attr('y', anyNumbersVisible ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
             // Probationer grade and line
             sephirothGroup.selectAll('.probationer-grade')
                 .transition().duration(300)
@@ -2099,21 +2107,21 @@
             sephirothGroup.selectAll('.probationer-line')
                 .transition().duration(300)
                 .style('opacity', (showGrades || showGradeNumbers) ? 1 : 0);
-            // Shift sephirah labels down if numbers or grade numbers visible
+            // Shift sephirah labels down if grade numbers visible
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)
                 .attr('y', showGradeNumbers ? (isMobile ? 6 : 7) : 0);
-            // Single-line grades shift
-            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2)')
+            // Single-line grades shift (exclude probationer)
+            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : 0);
+                .attr('y', showGradeNumbers ? (isMobile ? 6 : 7) : 0);
             // Two-line grades shift
             sephirothGroup.selectAll('.sephirah-grade-line1')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : (isMobile ? -5 : -6));
+                .attr('y', showGradeNumbers ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
             sephirothGroup.selectAll('.sephirah-grade-line2')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 14 : 17) : (isMobile ? 5 : 6));
+                .attr('y', showGradeNumbers ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
         });
 
         // Filter by status (legacy - filter buttons removed for reference version)

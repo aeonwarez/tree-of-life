@@ -1297,12 +1297,15 @@
         const svg = d3.select('#tree').attr('viewBox', [0, 0, width, height]);
         const g = svg.append('g');
 
-        // Calculate actual positions
+        // Calculate actual positions - maintain consistent aspect ratio
         const margin = isMobile ? 35 : 80;
-        const treeWidth = Math.min(width - margin * 2, 520);
-        const treeHeight = isMobile ? height - margin * 2 - 200 : height - margin * 2 - 70;
+        const maxTreeWidth = isMobile ? width - margin * 2 : Math.min(width - margin * 2, 520);
+        const idealAspectRatio = 0.65; // width/height ratio for the tree
+        const availableHeight = height - (isMobile ? 280 : 180);
+        const treeHeight = availableHeight;
+        const treeWidth = Math.min(maxTreeWidth, treeHeight * idealAspectRatio);
         const offsetX = (width - treeWidth) / 2;
-        const offsetY = isMobile ? margin + 110 : margin + 95;
+        const offsetY = isMobile ? margin + 100 : margin + 95;
 
         function getPos(id) {
             const pos = positions[id];
@@ -1581,8 +1584,8 @@
 
         sephiroth.forEach(seph => {
             const pos = getPos(seph.id);
-            const radius = seph.id === 6 ? (isMobile ? 26 : 36) : 
-                          (isMobile ? 20 : 28);
+            const radius = seph.id === 6 ? (isMobile ? 28 : 36) :
+                          (isMobile ? 22 : 28);
             
             // Da'ath gets reduced opacity
             const isDaath = seph.id === 11;
@@ -1623,8 +1626,9 @@
             // Name label - centered in circle
             group.append('text')
                 .attr('class', 'sephirah-label')
-                .attr('y', -4)
-                .attr('font-size', isMobile ? '8px' : '10px')
+                .attr('y', 0)
+                .attr('dominant-baseline', 'middle')
+                .attr('font-size', isMobile ? '7px' : '10px')
                 .attr('fill', labelColor)
                 .text(seph.name);
 

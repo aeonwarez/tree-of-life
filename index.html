@@ -1294,7 +1294,7 @@
             8: { x: 0.22, y: 0.55 },  // Hod
             9: { x: 0.5, y: 0.67 },   // Yesod
             10: { x: 0.5, y: 0.82 },  // Malkuth
-            0: { x: 0.5, y: 0.97 }    // Probationer (below Malkuth)
+            0: { x: 0.5, y: 0.93 }    // Probationer (below Malkuth)
         };
 
         // ===== VISUALIZATION =====
@@ -1617,19 +1617,21 @@
                     .attr('class', 'probationer')
                     .attr('transform', `translate(${pos.x}, ${pos.y})`);
 
-                // Horizontal line above
+                // Horizontal line above (hidden by default)
                 probGroup.append('line')
+                    .attr('class', 'probationer-line')
                     .attr('x1', -40)
                     .attr('x2', 40)
-                    .attr('y1', isMobile ? -18 : -22)
-                    .attr('y2', isMobile ? -18 : -22)
+                    .attr('y1', isMobile ? -12 : -16)
+                    .attr('y2', isMobile ? -12 : -16)
                     .attr('stroke', 'var(--text-dim)')
-                    .attr('stroke-width', 1);
+                    .attr('stroke-width', 1)
+                    .style('opacity', 0);
 
-                // Grade number (0°=0°)
+                // Grade number (0°= 0□)
                 probGroup.append('text')
                     .attr('class', 'sephirah-grade-number probationer-grade-number')
-                    .attr('y', isMobile ? -2 : -4)
+                    .attr('y', isMobile ? 2 : 2)
                     .attr('text-anchor', 'middle')
                     .style('opacity', 0)
                     .attr('fill', 'var(--text-secondary)')
@@ -1640,7 +1642,7 @@
                 // Grade name (Probationer)
                 probGroup.append('text')
                     .attr('class', 'sephirah-grade probationer-grade')
-                    .attr('y', isMobile ? 12 : 14)
+                    .attr('y', isMobile ? 16 : 18)
                     .attr('text-anchor', 'middle')
                     .style('opacity', 0)
                     .attr('fill', 'var(--text-secondary)')
@@ -1724,8 +1726,8 @@
             // Handle both single-line and two-line grade names
             const gradeNameIsArray = Array.isArray(seph.gradeName);
             if (gradeNameIsArray) {
-                // Two-line grade name
-                group.append('text')
+                // Two-line grade name (add data-daath for Da'ath to prevent shifting)
+                const line1 = group.append('text')
                     .attr('class', 'sephirah-grade sephirah-grade-line1')
                     .attr('y', isMobile ? -5 : -6)
                     .attr('text-anchor', 'middle')
@@ -1733,7 +1735,7 @@
                     .attr('font-size', isMobile ? '6px' : '8px')
                     .attr('fill', labelColor)
                     .text(seph.gradeName[0] || '');
-                group.append('text')
+                const line2 = group.append('text')
                     .attr('class', 'sephirah-grade sephirah-grade-line2')
                     .attr('y', isMobile ? 5 : 6)
                     .attr('text-anchor', 'middle')
@@ -1741,6 +1743,11 @@
                     .attr('font-size', isMobile ? '6px' : '8px')
                     .attr('fill', labelColor)
                     .text(seph.gradeName[1] || '');
+                // Da'ath has no grade number, so mark it to prevent shifting
+                if (isDaath) {
+                    line1.attr('data-daath', 'true');
+                    line2.attr('data-daath', 'true');
+                }
             } else {
                 // Single-line grade name
                 group.append('text')
@@ -2049,24 +2056,36 @@
                     .transition().duration(300)
                     .style('opacity', 0);
             }
-            // Single-line grades
-            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2)')
+            // Single-line grades (exclude probationer)
+            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
                 .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : 0);
-            // Two-line grades
-            sephirothGroup.selectAll('.sephirah-grade-line1')
+            // Two-line grades (exclude Da'ath from shifting since it has no number)
+            sephirothGroup.selectAll('.sephirah-grade-line1:not([data-daath])')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
                 .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : (isMobile ? -5 : -6));
-            sephirothGroup.selectAll('.sephirah-grade-line2')
+            sephirothGroup.selectAll('.sephirah-grade-line2:not([data-daath])')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
                 .attr('y', showGradeNumbers ? (isMobile ? 14 : 17) : (isMobile ? 5 : 6));
-            // Probationer grade
+            // Da'ath lines (never shift)
+            sephirothGroup.selectAll('.sephirah-grade-line1[data-daath]')
+                .transition().duration(300)
+                .style('opacity', showGrades ? 1 : 0);
+            sephirothGroup.selectAll('.sephirah-grade-line2[data-daath]')
+                .transition().duration(300)
+                .style('opacity', showGrades ? 1 : 0);
+            // Probationer grade and line
             sephirothGroup.selectAll('.probationer-grade')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0);
+            // Show probationer line if either grades or grade numbers visible
+            const showGradeNumbers = document.getElementById('toggleGradeNumbers').checked;
+            sephirothGroup.selectAll('.probationer-line')
+                .transition().duration(300)
+                .style('opacity', (showGrades || showGradeNumbers) ? 1 : 0);
         });
 
         // Toggle for Grade Numbers (replaces numbers)
@@ -2084,23 +2103,26 @@
             sephirothGroup.selectAll('.sephirah-grade-number:not(.probationer-grade-number)')
                 .transition().duration(300)
                 .style('opacity', showGradeNumbers ? 1 : 0);
-            // Probationer grade number
+            // Probationer grade number and line
             sephirothGroup.selectAll('.probationer-grade-number')
                 .transition().duration(300)
                 .style('opacity', showGradeNumbers ? 1 : 0);
+            sephirothGroup.selectAll('.probationer-line')
+                .transition().duration(300)
+                .style('opacity', (showGrades || showGradeNumbers) ? 1 : 0);
             // Shift sephirah labels down if numbers or grade numbers visible
             sephirothGroup.selectAll('.sephirah-label')
                 .transition().duration(300)
                 .attr('y', showGradeNumbers ? (isMobile ? 6 : 7) : 0);
-            // Single-line grades shift
-            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2)')
+            // Single-line grades shift (exclude probationer)
+            sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2):not(.probationer-grade)')
                 .transition().duration(300)
                 .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : 0);
-            // Two-line grades shift
-            sephirothGroup.selectAll('.sephirah-grade-line1')
+            // Two-line grades shift (exclude Da'ath which has no number)
+            sephirothGroup.selectAll('.sephirah-grade-line1:not([data-daath])')
                 .transition().duration(300)
                 .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : (isMobile ? -5 : -6));
-            sephirothGroup.selectAll('.sephirah-grade-line2')
+            sephirothGroup.selectAll('.sephirah-grade-line2:not([data-daath])')
                 .transition().duration(300)
                 .attr('y', showGradeNumbers ? (isMobile ? 14 : 17) : (isMobile ? 5 : 6));
         });

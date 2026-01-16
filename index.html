@@ -2053,16 +2053,16 @@
             sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2)')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', showGradeNumbers ? (isMobile ? 6 : 7) : 0);
+                .attr('y', showGradeNumbers ? (isMobile ? 10 : 12) : 0);
             // Two-line grades
             sephirothGroup.selectAll('.sephirah-grade-line1')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', showGradeNumbers ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
+                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : (isMobile ? -5 : -6));
             sephirothGroup.selectAll('.sephirah-grade-line2')
                 .transition().duration(300)
                 .style('opacity', showGrades ? 1 : 0)
-                .attr('y', showGradeNumbers ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
+                .attr('y', showGradeNumbers ? (isMobile ? 14 : 17) : (isMobile ? 5 : 6));
             // Probationer grade
             sephirothGroup.selectAll('.probationer-grade')
                 .transition().duration(300)
@@ -2095,14 +2095,14 @@
             // Single-line grades shift
             sephirothGroup.selectAll('.sephirah-grade:not(.sephirah-grade-line1):not(.sephirah-grade-line2)')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 6 : 7) : 0);
+                .attr('y', showGradeNumbers ? (isMobile ? 10 : 12) : 0);
             // Two-line grades shift
             sephirothGroup.selectAll('.sephirah-grade-line1')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 1 : 1) : (isMobile ? -5 : -6));
+                .attr('y', showGradeNumbers ? (isMobile ? 4 : 5) : (isMobile ? -5 : -6));
             sephirothGroup.selectAll('.sephirah-grade-line2')
                 .transition().duration(300)
-                .attr('y', showGradeNumbers ? (isMobile ? 11 : 13) : (isMobile ? 5 : 6));
+                .attr('y', showGradeNumbers ? (isMobile ? 14 : 17) : (isMobile ? 5 : 6));
         });
 
         // Filter by status (legacy - filter buttons removed for reference version)

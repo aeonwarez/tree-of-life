@@ -1891,7 +1891,7 @@
 
                 ${seph.parts.length > 0 ? `
                 <div class="detail-section">
-                    <div class="detail-section-title">Correspondences (${seph.parts.length})</div>
+                    <div class="detail-section-title">Correspondences</div>
                     <div class="detail-parts-list">
                         ${seph.parts.map(p => `
                             <div class="detail-part-item">
@@ -1904,7 +1904,7 @@
                 ` : ''}
 
                 <div class="detail-section">
-                    <div class="detail-section-title">Connected Paths (${connectedPaths.length})</div>
+                    <div class="detail-section-title">Connected Paths</div>
                     <div class="detail-parts-list">
                         ${connectedPaths.map(p => {
                             const otherSeph = sephiroth.find(s => s.id === (p.from === seph.id ? p.to : p.from));

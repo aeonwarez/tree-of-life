@@ -1684,10 +1684,11 @@
                 .attr('data-seph-id', seph.id)
                 .style('opacity', opacity);
 
-            // Glow filter based on status - Kether always glows bright
-            let glowFilter = '';
+            // Glow filter based on status - Kether uses CSS animation instead
+            let glowFilter = null;
             if (isKether) {
-                glowFilter = `drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 45px rgba(255, 255, 255, 0.3))`;
+                // Kether glow handled by CSS animation (ketherGlow)
+                glowFilter = null;
             } else if (seph.status === 'completed') {
                 glowFilter = `drop-shadow(0 0 12px ${seph.color}) drop-shadow(0 0 6px var(--completed-glow))`;
             } else if (seph.status === 'partial') {
